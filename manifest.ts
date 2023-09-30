@@ -15,6 +15,7 @@ const manifest: chrome.runtime.ManifestV3 = {
     type: "module",
   },
   action: {
+    default_title: "Fictional Fortnight",
     default_popup: "src/pages/popup/index.html",
     default_icon: "icon-34.png",
   },
@@ -24,14 +25,6 @@ const manifest: chrome.runtime.ManifestV3 = {
   icons: {
     "128": "icon-128.png",
   },
-  content_scripts: [
-    {
-      matches: ["http://*/*", "https://*/*", "<all_urls>"],
-      js: ["src/pages/content/index.js"],
-      // KEY for cache invalidation
-      css: ["assets/css/contentStyle<KEY>.chunk.css"],
-    },
-  ],
   devtools_page: "src/pages/devtools/index.html",
   web_accessible_resources: [
     {
