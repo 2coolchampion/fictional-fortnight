@@ -1,4 +1,4 @@
-import React from "react";
+import {useState} from "react";
 import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
 import useStorage from "@src/shared/hooks/useStorage";
@@ -7,32 +7,24 @@ import withSuspense from "@src/shared/hoc/withSuspense";
 
 const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
+  const [widgetEnabled, setWidgetEnabled] = useState(false)
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p className="text-lime-400">
-          Edit <code>src/pages/popup/Popup.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
-        <button
+    <>
+      <header>
+
+        
+        {/* <button
+          className="text-sm"
           style={{
-            color: theme === "light" ? "#fff" : "#000",
+            color: theme === "light" ? "red" : "blue",
           }}
           onClick={exampleThemeStorage.toggle}
         >
           Toggle theme: [{theme}]
-        </button>
+        </button> */}
       </header>
-    </div>
+    </>
   );
 };
 
