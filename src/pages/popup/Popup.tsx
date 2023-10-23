@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
 import useStorage from "@src/shared/hooks/useStorage";
@@ -9,11 +9,34 @@ const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
 
+  useEffect(() => {
+    chrome.scripting.getRegisteredContentScripts((contentScripts) => {
+      if (contentScripts.length > 0) {
+        setWidgetEnabled(true);
+      }
+    });
+  }, [])
+
+  const toggleWidget = () => {
+    if (widgetEnabled) {
+      chrome.scripting.unregisterContentScripts();
+    } else {
+      chrome.scripting.registerContentScripts([
+        {
+          id: "compactWidget-script",
+          matches: ['*://*/*'],
+          js: ["src/pages/content/index.js"],
+        },
+      ]);
+    }
+    setWidgetEnabled(!widgetEnabled)
+  }
+
   return (
     <>
       <header>
         <button
-          onClick={() => setWidgetEnabled(!widgetEnabled)}
+          onClick={toggleWidget}
         >
           {widgetEnabled ? "Disable" : "Enable"} widget
         </button>
