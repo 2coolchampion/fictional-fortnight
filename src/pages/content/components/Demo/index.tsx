@@ -6,12 +6,16 @@ import { attachTwindStyle } from "@src/shared/style/twind";
 refreshOnUpdate("pages/content");
 
 const root = document.createElement("div");
-root.id = "chrome-extension-boilerplate-react-vite-content-view-root";
+root.id = "fictional-fortnight-content-view-root";
+root.style.all = "unset";
 
 document.body.append(root);
 
 const rootIntoShadow = document.createElement("div");
 rootIntoShadow.id = "shadow-root";
+rootIntoShadow.style.position = "fixed";
+rootIntoShadow.style.bottom = "0";
+rootIntoShadow.style.right = "0";
 
 const shadowRoot = root.attachShadow({ mode: "open" });
 shadowRoot.appendChild(rootIntoShadow);

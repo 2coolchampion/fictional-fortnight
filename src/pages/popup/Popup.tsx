@@ -12,7 +12,11 @@ const Popup = () => {
   return (
     <>
       <header>
-
+        <button
+          onClick={() => setWidgetEnabled(!widgetEnabled)}
+        >
+          {widgetEnabled ? "Disable" : "Enable"} widget
+        </button>
         
         {/* <button
           className="text-sm"
