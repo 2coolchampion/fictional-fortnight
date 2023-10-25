@@ -1,9 +1,9 @@
 import {useState, useEffect} from "react";
-import logo from "@assets/img/logo.svg";
 import "@pages/popup/Popup.css";
 import useStorage from "@src/shared/hooks/useStorage";
 import exampleThemeStorage from "@src/shared/storages/exampleThemeStorage";
 import withSuspense from "@src/shared/hoc/withSuspense";
+import settingsIcon from "@src/assets/icons/settings.svg";
 
 const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -34,12 +34,28 @@ const Popup = () => {
 
   return (
     <>
-      <header>
+      <header className="w-full">
         <button
+          className="text-lg p-2 border-2 border-blue-500"
           onClick={toggleWidget}
         >
           {widgetEnabled ? "Disable" : "Enable"} widget
         </button>
+        <div
+        className="flex justify-center items-center"
+        >
+          <hr className="border-gray-800 my-4 flex-1 "/>
+          <h2 className="text-lg inline mx-2 ">OR</h2>
+          <hr className="border-gray-800 my-4 flex-1"/>
+        </div>
+
+        <h3 className="text-center mb-4">Disable extension for following sites:</h3>
+
+        <div className="flex justify-between">
+          <button className="text-sm p-1 border-1 border-yellow-500">+ Current site</button>
+          <img src={settingsIcon} alt="settings"/>
+        </div>
+
         
         {/* <button
           className="text-sm"

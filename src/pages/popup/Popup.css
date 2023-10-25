@@ -1,5 +1,5 @@
 #app-container {
-  width: 100%;
+  width: auto;
   min-height: 200px;
   height: fit-content;
   display: flex;
