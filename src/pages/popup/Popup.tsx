@@ -2,11 +2,13 @@ import {useState, useEffect} from "react";
 import "@pages/popup/Popup.css";
 import useStorage from "@src/shared/hooks/useStorage";
 import exampleThemeStorage from "@src/shared/storages/exampleThemeStorage";
+import extensionModeStorage from "@root/src/shared/storages/extensionModeStorage";
 import withSuspense from "@src/shared/hoc/withSuspense";
 import settingsIcon from "@src/assets/icons/settings.svg";
 
 const Popup = () => {
   const theme = useStorage(exampleThemeStorage);
+  const mode = useStorage (extensionModeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
 
   useEffect(() => {
@@ -32,6 +34,10 @@ const Popup = () => {
     setWidgetEnabled(!widgetEnabled)
   }
 
+  const toggleExtesionMode = () => {
+    extensionModeStorage.toggle()
+  }
+
   return (
     <>
       <header className="w-full">
@@ -53,6 +59,11 @@ const Popup = () => {
 
         <div className="flex justify-between">
           <button className="text-sm p-1 border-1 border-yellow-500">+ Current site</button>
+          <button
+            onClick={toggleExtesionMode}
+          >
+            {mode === "whitelist" ? "Blacklist" : "Whitelist"}
+          </button>
           <img src={settingsIcon} alt="settings"/>
         </div>
 
