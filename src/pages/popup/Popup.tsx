@@ -3,13 +3,15 @@ import "@pages/popup/Popup.css";
 import useStorage from "@src/shared/hooks/useStorage";
 import exampleThemeStorage from "@src/shared/storages/exampleThemeStorage";
 import extensionModeStorage from "@root/src/shared/storages/extensionModeStorage";
+import whitelistStorage from "@root/src/shared/storages/whitelistStorage";
 import withSuspense from "@src/shared/hoc/withSuspense";
 import settingsIcon from "@src/assets/icons/settings.svg";
 
 const Popup = () => {
-  const theme = useStorage(exampleThemeStorage);
+  // const theme = useStorage(exampleThemeStorage);
   const mode = useStorage (extensionModeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
+  const whitelist = useStorage(whitelistStorage);
 
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
@@ -38,6 +40,20 @@ const Popup = () => {
     extensionModeStorage.toggle()
   }
 
+  const addCurrentSite = () => {
+    if (mode === "whitelist") {
+      const currentWhitelist = whitelistStorage.getSnapshot();
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          const currentSite = new URL(tabs[0].url).hostname;
+          whitelistStorage.set([...currentWhitelist, currentSite]);
+        }
+      });
+    } else {
+      // blacklistStorage.add
+    }
+  }
+
   return (
     <>
       <header className="w-full">
@@ -58,7 +74,12 @@ const Popup = () => {
         <h3 className="text-center mb-4">Disable extension for following sites:</h3>
 
         <div className="flex justify-between">
-          <button className="text-sm p-1 border-1 border-yellow-500">+ Current site</button>
+          <button 
+          className="text-sm p-1 border-1 border-yellow-500"
+          onClick={addCurrentSite}
+          >
+            + Current site
+          </button>
           <button
             onClick={toggleExtesionMode}
           >
@@ -67,7 +88,27 @@ const Popup = () => {
           <img src={settingsIcon} alt="settings"/>
         </div>
 
-        
+        <div>
+          {whitelist.map((site) => (
+            <div
+              className="flex left"
+                key={site}
+              >
+              <p 
+                className="inline"
+              >
+                {site}
+              </p>
+              <button 
+                className="inline-block bg-red-400 px-2 rounded-full"
+                onClick={() => whitelistStorage.remove(site)}
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
+
         {/* <button
           className="text-sm"
           style={{
