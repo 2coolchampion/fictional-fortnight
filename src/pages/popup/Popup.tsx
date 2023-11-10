@@ -13,7 +13,7 @@ const Popup = () => {
   const mode = useStorage (extensionModeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
   const whitelist = useStorage(whitelistStorage);
-  const Blacklist = useStorage(blacklistStorage);
+  const blacklist = useStorage(blacklistStorage);
 
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
@@ -91,30 +91,53 @@ const Popup = () => {
           <button
             onClick={toggleExtesionMode}
           >
-            {mode === "whitelist" ? "Blacklist" : "Whitelist"}
+            {mode === "whitelist" ? "Whitelist" : "Blacklist"}
           </button>
           <img src={settingsIcon} alt="settings"/>
         </div>
 
         <div>
-          {whitelist.map((site) => (
-            <div
-              className="flex left"
-                key={site}
-              >
-              <p 
-                className="inline"
-              >
-                {site}
-              </p>
-              <button 
-                className="inline-block bg-red-400 px-2 rounded-full"
-                onClick={() => whitelistStorage.remove(site)}
-              >
-                X
-              </button>
-            </div>
-          ))}
+          {mode === 'whitelist' ? (
+            whitelist.map((site) => (
+              <div
+                className="flex left"
+                  key={site}
+                >
+                <p 
+                  className="inline"
+                >
+                  {site}
+                </p>
+                <button 
+                  className="inline-block bg-red-400 px-2 rounded-full"
+                  onClick={() => whitelistStorage.remove(site)}
+                >
+                  X
+                </button>
+              </div>
+            ))
+          ) : (
+            blacklist.map((site) => (
+              <div
+                className="flex left"
+                  key={site}
+                >
+                <p 
+                  className="inline"
+                >
+                  {site}
+                </p>
+                <button 
+                  className="inline-block bg-red-400 px-2 rounded-full"
+                  onClick={() => blacklistStorage.remove(site)}
+                >
+                  X
+                </button>
+              </div>
+            ))
+          )  
+          }
+          
         </div>
 
         {/* <button
