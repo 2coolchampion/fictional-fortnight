@@ -4,6 +4,7 @@ import useStorage from "@src/shared/hooks/useStorage";
 import exampleThemeStorage from "@src/shared/storages/exampleThemeStorage";
 import extensionModeStorage from "@root/src/shared/storages/extensionModeStorage";
 import whitelistStorage from "@root/src/shared/storages/whitelistStorage";
+import blacklistStorage from "@root/src/shared/storages/blacklistStorage";
 import withSuspense from "@src/shared/hoc/withSuspense";
 import settingsIcon from "@src/assets/icons/settings.svg";
 
@@ -12,6 +13,7 @@ const Popup = () => {
   const mode = useStorage (extensionModeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
   const whitelist = useStorage(whitelistStorage);
+  const Blacklist = useStorage(blacklistStorage);
 
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
@@ -50,7 +52,13 @@ const Popup = () => {
         }
       });
     } else {
-      // blacklistStorage.add
+      const currentBlacklist = blacklistStorage.getSnapshot();
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          const currentSite = new URL(tabs[0].url).hostname;
+          blacklistStorage.set([...currentBlacklist, currentSite]);
+        }
+      })
     }
   }
 
