@@ -42,24 +42,24 @@ const Popup = () => {
     extensionModeStorage.toggle()
   }
 
-  const addCurrentSite = () => {
-    if (mode === "whitelist") {
-      const currentWhitelist = whitelistStorage.getSnapshot();
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs.length > 0) {
-          const currentSite = new URL(tabs[0].url).hostname;
-          whitelistStorage.set([...currentWhitelist, currentSite]);
-        }
-      });
+  const addCurrentSite = async () => {
+    const activeTab = await chrome.tabs.query({active: true, currentWindow: true});
+    const currentSite = new URL(activeTab[0].url).hostname
+
+    if (activeTab.length > 0) {
+      if (
+        mode === "whitelist" 
+        && !whitelist.includes(currentSite)
+      ) {
+        whitelistStorage.set([...whitelist, currentSite]);
+      } else {
+        blacklistStorage.set([...blacklist, currentSite]);
+      }
     } else {
-      const currentBlacklist = blacklistStorage.getSnapshot();
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs.length > 0) {
-          const currentSite = new URL(tabs[0].url).hostname;
-          blacklistStorage.set([...currentBlacklist, currentSite]);
-        }
-      })
+      console.error("No active tab");
     }
+
+    
   }
 
   return (
