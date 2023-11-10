@@ -14,6 +14,7 @@ const Popup = () => {
   const [widgetEnabled, setWidgetEnabled] = useState(false)
   const whitelist = useStorage(whitelistStorage);
   const blacklist = useStorage(blacklistStorage);
+  const [currentSite, setCurrentSite] = useState("")
 
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
@@ -48,18 +49,31 @@ const Popup = () => {
 
     if (activeTab.length > 0) {
       if (
-        mode === "whitelist" 
-        && !whitelist.includes(currentSite)
+        mode === "whitelist" &&
+        !whitelist.includes(currentSite)
       ) {
         whitelistStorage.set([...whitelist, currentSite]);
-      } else {
+      } else if (
+        mode === "whitelist" &&
+        whitelist.includes(currentSite)
+        ) {
+        whitelistStorage.remove(currentSite);
+      };
+      
+      if (
+        mode === 'blacklist' &&
+        !blacklist.includes(currentSite)
+      ) {
         blacklistStorage.set([...blacklist, currentSite]);
-      }
+      } else if (
+        mode === 'blacklist' &&
+        blacklist.includes(currentSite)
+        ) {
+        blacklistStorage.remove(currentSite);
+      };
     } else {
       console.error("No active tab");
-    }
-
-    
+    } 
   }
 
   return (
