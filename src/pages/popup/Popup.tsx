@@ -14,7 +14,8 @@ const Popup = () => {
   const [widgetEnabled, setWidgetEnabled] = useState(false)
   const whitelist = useStorage(whitelistStorage);
   const blacklist = useStorage(blacklistStorage);
-  const [currentSite, setCurrentSite] = useState("")
+  const [currentSite, setCurrentSite] = useState<URL | null>(null);
+  const  [currentSiteHostname, setCurrentSiteHostname] = useState(currentSite?.hostname?.replace(/^www\./, "") ?? "Something's wrong");
 
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
@@ -22,6 +23,27 @@ const Popup = () => {
         setWidgetEnabled(true);
       }
     });
+
+    const updateCurrentSite = async () => {
+      const activeTab = await chrome.tabs.query({active: true, currentWindow: true});
+      const url = new URL(activeTab[0].url);
+      const newSite = url;
+      setCurrentSite(newSite);
+      setCurrentSiteHostname(newSite.hostname.replace(/^www\./, ""));
+    }
+
+    // Call the function once when the component mounts
+    updateCurrentSite();
+
+    // Add a listener to update the current site whenever it changes
+    chrome.tabs.onActivated.addListener(updateCurrentSite);
+    chrome.tabs.onUpdated.addListener(updateCurrentSite);
+  
+     // Clean up the listeners when the component unmounts
+     return () => {
+      chrome.tabs.onActivated.removeListener(updateCurrentSite);
+      chrome.tabs.onUpdated.removeListener(updateCurrentSite);
+    };
   }, [])
 
   const toggleWidget = () => {
@@ -76,8 +98,36 @@ const Popup = () => {
     } 
   }
 
+  const isOnList = () => {
+    if (mode === 'whitelist') {
+      return whitelist.includes(currentSiteHostname);
+    } else if (mode === 'blacklist') {
+      return blacklist.includes(currentSiteHostname);
+    }
+    return false
+  }
+  
+  const renderButton = () => {
+    if (isOnList()) {
+      return (
+        <button className="text-sm p-1 border-1 border-red-500" onClick={addCurrentSite}>
+          -
+          {currentSiteHostname}
+        </button>
+      );
+    } else {
+      return (
+        <button className="text-sm p-1 border-1 border-green-500" onClick={addCurrentSite}>
+          +
+          {currentSiteHostname}
+        </button>
+      );
+    }
+  };
+
   return (
     <>
+  
       <header className="w-full">
         <button
           className="text-lg p-2 border-2 border-blue-500"
@@ -85,6 +135,7 @@ const Popup = () => {
         >
           {widgetEnabled ? "Disable" : "Enable"} widget
         </button>
+        
         <div
         className="flex justify-center items-center"
         >
@@ -96,12 +147,11 @@ const Popup = () => {
         <h3 className="text-center mb-4">Disable extension for following sites:</h3>
 
         <div className="flex justify-between">
-          <button 
-          className="text-sm p-1 border-1 border-yellow-500"
-          onClick={addCurrentSite}
+          <div 
+          className="flex justify-between items-center"
           >
-            + Current site
-          </button>
+            {renderButton()}
+          </div>
           <button
             onClick={toggleExtesionMode}
           >
