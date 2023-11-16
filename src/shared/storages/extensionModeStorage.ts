@@ -3,7 +3,7 @@ import {
   StorageType 
 } from "@src/shared/storages/base";
 
-type ExtensionMode = "blacklist" | "whitelist";
+export type ExtensionMode = "blacklist" | "whitelist";
 
 const storage = createStorage<ExtensionMode>('extension-mode', 'blacklist', { storageType: StorageType.Local });
 

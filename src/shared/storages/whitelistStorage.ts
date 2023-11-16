@@ -11,6 +11,8 @@ const whitelistStorage = {
     const currentWhitelist = Storage.getSnapshot();
     const updatedWhitelist = currentWhitelist.filter(website => !websitesToRemove.includes(website));
     Storage.set(updatedWhitelist);
+
+    return updatedWhitelist;
   }
 }
 

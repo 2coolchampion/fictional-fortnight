@@ -11,6 +11,8 @@ const blacklistStorage = {
     const currentBlacklist = Storage.getSnapshot();
     const updatedBlacklist = currentBlacklist.filter(website => !websitesToRemove.includes(website));
     Storage.set(updatedBlacklist);
+
+    return updatedBlacklist;
   }
 }
 
