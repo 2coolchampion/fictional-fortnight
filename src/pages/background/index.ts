@@ -1,4 +1,5 @@
 import reloadOnUpdate from "virtual:reload-on-update-in-background-script";
+import extensionModeStorage from "@src/shared/storages/extensionModeStorage";
 
 reloadOnUpdate("pages/background");
 
@@ -25,5 +26,8 @@ chrome.runtime.onInstalled.addListener(async () => {
     console.log('Scripts sucesfully registered: ', registeredScripts);
   }).catch((err) => {
     console.error('Error registering content scripts: ', err);
-  })
+  });
+
+  // set extension mode to whitelist as a default mode
+  extensionModeStorage.set("blacklist");
 })

@@ -87,20 +87,22 @@ const Popup = () => {
     if (mode === 'whitelist') {
       chrome.scripting.updateContentScripts([{
         id: "compactWidget-script",
-        matches: updatedList.map((site) => `*://${site}/*`),
+        matches: updatedList ? updatedList.map((site) => `*://${site}/*`) : whitelist.map((site) => `*://${site}/*`),
+        excludeMatches: [],
         js: ["src/pages/content/index.js"],
       }])
     } else if (mode === 'blacklist') {
       chrome.scripting.updateContentScripts([{
         id: "compactWidget-script",
         matches: ["*://*/*"],
-        excludeMatches: updatedList.map((site) => `*://${site}/*`),
+        excludeMatches: updatedList ? updatedList.map((site) => `*://${site}/*`) : blacklist.map((site) => `*://${site}/*`),
         js: ["src/pages/content/index.js"],
       }])
     }
   }
 
-  const unregisterScript = (updatedList) => {
+  const unregisterScript = async (updatedList) => {
+    // ONLY USE FOR WHEN ITEMS ARE BEING REMOVED FROM WHITELIST OR BLACKLIST
     // removes a script if the last item in current whitelist or blacklist is removed.
                   
     // if ((mode === 'whitelist' && whitelist.length === 0) || (mode === 'blacklist' && blacklist.length === 0)) {
@@ -109,20 +111,20 @@ const Popup = () => {
     //   });
     // }
 
-    if (mode === 'whitelist' && updatedList.length === 0 && registerScript.length > 0) {
+    const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
+
+    if (mode === 'whitelist' && updatedList.length === 0 && registeredScripts.length > 0) {
       chrome.scripting.unregisterContentScripts({
         ids: ["compactWidget-script"], 
       });
-
-      console.log("unregistered script since the last item in blacklist is removed");
     };
 
     if (mode === 'blacklist' && updatedList.length === 0 && registerScript.length > 0) {
+      
       chrome.scripting.unregisterContentScripts({
         ids: ["compactWidget-script"], 
       });
 
-      console.log("unregistered script since the last item in blacklist is removed");
     };
 
     
@@ -142,19 +144,40 @@ const Popup = () => {
     setWidgetEnabled(!widgetEnabled)
   }
 
-  const toggleExtesionMode = () => {
+  // from blacklist to whitelist, didn't update Exclude matches
 
-      if (mode === 'whitelist' && blacklist.length != 0) {
+  const toggleExtesionMode = async () => {
+    const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
 
-        registerScript("blacklist");
-
-      } else if (mode === 'blacklist' && whitelist.length != 0) {
-        registerScript("whitelist");
-      };
-
-    // update content script with appropriate amtches and excludeMatches properties.
+    if (widgetEnabled) {
+      if (registeredScripts.length > 0) {
+        if (mode === 'whitelist' && blacklist.length != 0) {
+          updateScript("blacklist");
+  
+        } else if ( mode === 'whitelist' && blacklist.length === 0) {
+          chrome.scripting.unregisterContentScripts({
+            ids: ["compactWidget-script"], 
+          });
+        } else if (mode === 'blacklist' && whitelist.length != 0) {
+          updateScript("whitelist");
+  
+        } else if (mode === 'blacklist' && whitelist.length === 0) {
+          chrome.scripting.unregisterContentScripts({
+            ids: ["compactWidget-script"], 
+          });
+        };
+  
+      } else {
+        if (mode === 'whitelist' && blacklist.length != 0) {
+          registerScript("blacklist");
+        } else if (mode === 'blacklist' && whitelist.length != 0) {
+          registerScript("whitelist");
+        };
+      }
+    }
 
     extensionModeStorage.toggle()
+
   }
 
   const addToList = async () => {
@@ -164,53 +187,86 @@ const Popup = () => {
     if (activeTab.length > 0) {
       if ( mode === 'whitelist') {
 
-        if (widgetEnabled && whitelist.length === 0) {
-          const updatedWhitelist = await whitelistStorage.set([currentSite]);
-          registerScript("whitelist", updatedWhitelist);
-
-        } else {
-          if (!whitelist.includes(currentSite)) {
-            whitelistStorage.set([...whitelist, currentSite]);
-
-          } else if (whitelist.includes(currentSite)) {
-            whitelistStorage.remove(currentSite);
-
-            if (whitelist.length === 0) {
-              chrome.scripting.unregisterContentScripts({
-                ids: ["compactWidget-script"], 
-              });
-            }
+        if (widgetEnabled) {
+          if (whitelist.length === 0) {
+            // add to whitelist and register the content script
+            const updatedWhitelist = await whitelistStorage.set([currentSite]);
+            registerScript("whitelist", updatedWhitelist);
+          } else {
+            // add to whitelist and update the content script
+            const updatedWhitelist = await whitelistStorage.set([...whitelist, currentSite]);
+            updateScript("whitelist", updatedWhitelist);
           }
+        } else if (!widgetEnabled) {
+          // just add to whitelist
+          whitelistStorage.set([...whitelist, currentSite])
         }
 
-      } else {
-        if (widgetEnabled && blacklist.length === 0) {
-          const updatedBlacklist = await blacklistStorage.set([currentSite]);
-          registerScript("blacklist", updatedBlacklist);
+      } else if (mode === 'blacklist') {
 
-        } else {
-          if (!blacklist.includes(currentSite)) {
-            blacklistStorage.set([...blacklist, currentSite]);
+        if (widgetEnabled) {
 
-          } else if (blacklist.includes(currentSite)) {
-            blacklistStorage.remove(currentSite);
+          const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
 
-            if (blacklist.length === 0) {
-              chrome.scripting.unregisterContentScripts({
-                ids: ["compactWidget-script"], 
-              });
-            }
+          if (blacklist.length === 0 && registeredScripts.length === 0) {
+            // add to blacklist and register the content script
+            const updatedBlacklist = await blacklistStorage.set([currentSite]);
+            registerScript("blacklist", updatedBlacklist);
+          } else if (blacklist.length === 0 && registeredScripts.length != 0) {
+            // add to blacklist and update the content script. This is only going to execute when the extension is first installed.
+            const updatedBlacklist = await blacklistStorage.set([...blacklist, currentSite]);
+            updateScript("blacklist", updatedBlacklist);
+          } else {
+            // add to blacklist and update the content script
+            const updatedBlacklist = await blacklistStorage.set([...blacklist, currentSite]);
+            updateScript("blacklist", updatedBlacklist);
           }
+        } else if (!widgetEnabled) {
+          // just add to blacklist
+          blacklistStorage.set([...blacklist, currentSite])
         }
-
-        
       }
     } else {
       console.error("No active tab");
     }
+  }
 
-    if (widgetEnabled) {
-      updateScript(mode);
+  const removeFromList = async () => {
+    const activeTab = await chrome.tabs.query({active: true, currentWindow: true});
+    const currentSite = new URL(activeTab[0].url).hostname
+    
+    if (activeTab.length > 0) {
+      if (mode === 'whitelist') {
+
+        if (widgetEnabled) {
+          if (whitelist.length === 1) {
+            // remove from whitelist and unregister the content script
+            whitelistStorage.remove(currentSite);
+            chrome.scripting.unregisterContentScripts({
+              ids: ["compactWidget-script"], 
+            });
+          } else {
+            // remove from whitelist and update the content script
+            const updatedWhitelist = await whitelistStorage.remove(currentSite);
+            updateScript("whitelist", updatedWhitelist);
+          }
+          
+        } else if  (!widgetEnabled) {
+          whitelistStorage.remove(currentSite)
+        }
+
+      } else if (mode === 'blacklist') {
+
+        if (widgetEnabled) {
+
+            // remove from blacklist and update the content script
+            const updatedBlacklist = await blacklistStorage.remove(currentSite);
+            updateScript("blacklist", updatedBlacklist);
+          
+        } else if (!widgetEnabled) {
+          blacklistStorage.remove(currentSite)
+        }
+      }
     }
   }
 
@@ -226,7 +282,7 @@ const Popup = () => {
   const renderButton = () => {
     if (isOnList()) {
       return (
-        <button className="text-sm p-1 border-1 border-red-500" onClick={addToList}>
+        <button className="text-sm p-1 border-1 border-red-500" onClick={removeFromList}>
           -
           {currentSiteHostname}
         </button>
@@ -243,11 +299,11 @@ const Popup = () => {
 
 
   
-  const onClickRemoveSite = async (site: string) => {
-    const updatedBlacklist = await blacklistStorage.remove(site);
-    await unregisterScript(updatedBlacklist);
-    updateScript('blacklist');
-  }
+  // const onClickRemoveSite = async (site: string) => {
+  //   const updatedBlacklist = await blacklistStorage.remove(site);
+  //   await unregisterScript(updatedBlacklist);
+  //   updateScript('blacklist');
+  // }
 
   return (
     <>
@@ -300,7 +356,11 @@ const Popup = () => {
                   className="inline-block bg-red-400 px-2 rounded-full"
                   onClick={async () => {
                     const updatedWhitelist = await whitelistStorage.remove(site);
-                    unregisterScript(updatedWhitelist);updateScript('whitelist', updatedWhitelist);
+                    if (updatedWhitelist.length === 0) {
+                      unregisterScript(updatedWhitelist);
+                    } else {
+                      updateScript('whitelist', updatedWhitelist);
+                    }
                   }}
                 >
                   X
@@ -322,7 +382,7 @@ const Popup = () => {
                   className="inline-block bg-red-400 px-2 rounded-full"
                   onClick={async () => {
                     const updatedBlacklist = await blacklistStorage.remove(site);
-                    unregisterScript(updatedBlacklist);updateScript('blacklist', updatedBlacklist);
+                    updateScript('blacklist', updatedBlacklist);
                   }}
                 >
                   X
