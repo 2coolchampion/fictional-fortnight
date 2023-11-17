@@ -137,7 +137,7 @@ const Popup = () => {
       if (mode === "whitelist" && whitelist.length != 0) {
         registerScript("whitelist");
 
-      } else if (mode === "blacklist" && blacklist.length != 0) {
+      } else if (mode === "blacklist") {
         registerScript("blacklist");
       }
     }
@@ -168,7 +168,7 @@ const Popup = () => {
         };
   
       } else {
-        if (mode === 'whitelist' && blacklist.length != 0) {
+        if (mode === 'whitelist') {
           registerScript("blacklist");
         } else if (mode === 'blacklist' && whitelist.length != 0) {
           registerScript("whitelist");
