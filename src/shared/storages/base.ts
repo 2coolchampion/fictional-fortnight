@@ -54,6 +54,9 @@ export function createStorage<D>(
     }
     await chrome.storage[storageType].set({ [key]: cache });
     _emitChange();
+
+    // Return the updated cache value
+    return cache;
   };
 
   const subscribe = (listener: () => void) => {
