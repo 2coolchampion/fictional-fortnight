@@ -4,6 +4,8 @@ import attachEventHandlers from "./tokenEventHandlers";
 const TextAnalyzer = () => {
 
   const [IsContentEditable, setContentEditable] = useState(true)
+  const [splitMode, setSplitMode] = useState(false);
+  const [combineMode, setCombineMode] = useState(false);
 
   const handleSendToFastAPI = () => {
     const textBox = document.getElementById("textbox");
@@ -49,12 +51,22 @@ const TextAnalyzer = () => {
         // Replace the original text with the formatted text
         document.getElementById("textbox").innerHTML = formattedText;
 
-        // Attac hevent handlers
+        // Attach event handlers
         attachEventHandlers();
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+  };
+
+  const handleSplitMode = () => {
+    setSplitMode(!splitMode);
+    setCombineMode(false);
+  };
+
+  const handleCombineMode = () => {
+    setCombineMode(!combineMode);
+    setSplitMode(false);
   };
 
   return (
@@ -79,7 +91,13 @@ const TextAnalyzer = () => {
           </button>
           <button
           className="text-sm p-1 border-1 border-black hover:bg-gray-200"
-          >Manual mode
+          onClick={handleSplitMode}
+          >Split
+          </button>
+          <button
+          className="text-sm p-1 border-1 border-black hover:bg-gray-200"
+          onClick={handleCombineMode}
+          >Combine
           </button>
         </div>
         <div
