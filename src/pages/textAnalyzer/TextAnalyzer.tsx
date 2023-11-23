@@ -9,7 +9,7 @@ const TextAnalyzer = () => {
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
-  const lastSelectedToken = useRef(null)
+  let lastSelectedTokenRef = useRef(null)
   const useSelectionCountRef = useRef(0);
 
   useEffect(() => {
@@ -85,7 +85,6 @@ const TextAnalyzer = () => {
           // Move selection in between two new tokens for better UX
           selection.removeAllRanges()
           const range = document.createRange();
-          console.log('first child of newSpan1', newSpan1.firstChild)
           range.setStart(newSpan1.firstChild, newSpan1.textContent.length); // Set the start of the range to the end of newSpan1
           selection.addRange(range); // Add the new range
 
@@ -145,17 +144,22 @@ const TextAnalyzer = () => {
 
   const handleMouseDown = (e) => {
     const target = e.target;
+
     // remove selected class
-    if (target.classList.contains('selected') && lastSelectedToken.current !== target) {
-      target.classList.remove("selected");
+    if (target.classList.contains('selected')) {
+      const isItTheSameToken = lastSelectedTokenRef.current === target
+      if (!isItTheSameToken) {
+        target.classList.remove("selected");
+      }
     } else {
       // add selected class
       if (target.tagName==="SPAN" && target.classList.contains("token")) {
         target.classList.add("selected");
-        lastSelectedToken.current = target;
+        
         if (target.classList.contains("hovering")) {
           target.classList.remove("hovering");
         };
+        lastSelectedTokenRef.current = target;
         useSelectionCountRef.current += 1;
       };
 
@@ -190,7 +194,6 @@ const mainContainerRef = useRef<HTMLDivElement>(null);
 
 const handleClickOutside = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
-  console.log(e.target)
 
   if (
     !(target.id === "textbox") &&
@@ -199,19 +202,15 @@ const handleClickOutside = (e: MouseEvent) => {
     const selectedTags = document.getElementsByClassName("selected");
     for (let i = 0; i < selectedTags.length; i++) {
       selectedTags[i].classList.remove("selected");
-      console.log('removed')
     }
   }
 };
 
 useEffect(() => {
-  console.log('adding event listener')
   document.addEventListener('click', handleClickOutside);
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
-      console.log('removing event listener')
-
     };
 }, []);
 

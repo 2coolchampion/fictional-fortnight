@@ -5,19 +5,15 @@ body  {
 
 .token {
   color: #f1e1d4;
-  display: inline-block;
-  z-index: 1;
+  
 }
 
 span.token {
   position: relative;
-  display: inline-block;
 }
 
 span.token.selected {
-  outline: none;
   background-color: #FA6526;
-  z-index: -1;
 }
 
 span.token.hovering::before {
@@ -29,9 +25,11 @@ span.token.hovering::before {
   width: 100%;
   height: 100%;
   z-index: -1; /* Ensure the pseudo-element is behind the content */
+  pointer-events: none;
 }
 
 span.token.hovering::after {
+  pointer-events: none;
   content: ""; /* Create an empty content */
   display: inline-block; /* Make it a block element */
   height: 8px; /* Set the height of the underline */
