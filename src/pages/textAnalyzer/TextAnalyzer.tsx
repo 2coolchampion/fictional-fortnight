@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { handleSplit } from "./tokenEventHandlers";
 import { getEventListeners } from "events";
 
 const TextAnalyzer = () => {
@@ -10,6 +9,8 @@ const TextAnalyzer = () => {
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
+  const lastSelectedToken = useRef(null)
+  const useSelectionCountRef = useRef(0);
 
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -36,13 +37,13 @@ const TextAnalyzer = () => {
  
   // --- --- ---
 
-  let textboxRef = useRef(null); 
+  let textboxRef = useRef<HTMLDivElement>(null); 
   
   // initialized textboxRef on componentDidMount since textbox is not available on componentHasRendered on first mount.
 
   useEffect(() => {
     const textboxElement = document.getElementById("textbox");
-    textboxRef.current = textboxElement;
+    textboxRef.current = textboxElement as HTMLDivElement;
     if (textboxRef.current) {
       textboxRef.current.focus();
     }
@@ -98,7 +99,6 @@ const TextAnalyzer = () => {
   const handleCombining = () => {
       }
 
-  // add class to token on hover and move selection inbetween split tokens. Or change inserting ebhaviour.
 
   const handleSendToFastAPI = () => {
     const textBox = document.getElementById("textbox");
@@ -144,17 +144,33 @@ const TextAnalyzer = () => {
     textboxRef.current.innerText = "Here goes another mistake I know I'm going to make tonight. Even If I wanted to. If I was you.";
   };
 
-  useEffect
-
-  const handleClick = (e) => {
-      const target = e.target;
+  const handleMouseDown = (e) => {
+    const target = e.target;
+    // remove selected class
+    if (target.classList.contains('selected') && lastSelectedToken.current !== target) {
+      target.classList.remove("selected");
+    } else {
+      // add selected class
       if (target.tagName==="SPAN" && target.classList.contains("token")) {
         target.classList.add("selected");
+        lastSelectedToken.current = target;
         if (target.classList.contains("hovering")) {
           target.classList.remove("hovering");
+        };
+        useSelectionCountRef.current += 1;
+      };
+
+      if (useSelectionCountRef.current > 1 ) {
+        //find other selected tags and remove them.
+        const selectedTags = document.getElementsByClassName("selected");
+        for (let i = 0; i < selectedTags.length; i++) {
+          if (selectedTags[i] !== target) {
+            selectedTags[i].classList.remove("selected");
+          }
         }
+
       }
- 
+    } 
   };
 
   const handleMouseOver = (e) => {
@@ -168,40 +184,65 @@ const TextAnalyzer = () => {
     const target = e.target;
     if (target.tagName==="SPAN" && target.classList.contains("token")) {
       target.classList.remove("hovering");
-      target.classList.remove('selected');
     }
 };
 
-  const handleEditClick = () => {
-    // Enable the editing functionality
-    textboxRef.current.contentEditable = true;
-    textboxRef.current.focus();
-  };
+const mainContainerRef = useRef<HTMLDivElement>(null);
+
+const handleClickOutside = (e: MouseEvent) => {
+  const target = e.target as HTMLElement;
+  console.log(e.target)
+
+  if (
+    !(target.id === "textbox") &&
+    !target.classList.contains('token')
+  ) {
+    const selectedTags = document.getElementsByClassName("selected");
+    for (let i = 0; i < selectedTags.length; i++) {
+      selectedTags[i].classList.remove("selected");
+      console.log('removed')
+    }
+  }
+};
+
+useEffect(() => {
+  console.log('adding event listener')
+  document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      console.log('removing event listener')
+
+    };
+}, []);
+
+
 
   return (
     <>
       <div 
-      className="flex flex-col justify-center items-center w-full h-full mt-10"
+      className="main-container flex flex-col justify-center items-center w-full h-full mt-10"
+      ref={mainContainerRef}
       >
         <div 
         id="textbox"
         ref={(node) => (textboxRef.current = node)}
-        contentEditable={false} // Disable editing initially
-        className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0"
+        contentEditable
+        className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
         onKeyDown={ (e) => {
-            if (e.ctrlKey && e.key === 's') {
-              e.preventDefault();
+          if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
             if (currentMode === "edit") {
               handleSplitting(e);
               // handleCombining(e)
             }
-            }
+          }
             
           }
         }
-        onClick={(e) => {
+        onMouseDown={(e) => {
           if (currentMode === "edit") {
-            handleClick(e);
+            handleMouseDown(e);
           }
         }}
         onMouseOver={(e) => {
@@ -234,7 +275,12 @@ const TextAnalyzer = () => {
           <button 
           className="text-sm p-1 border-1 border-orange-100 hover:bg-yellow-800 px-2"
           onClick={() => {
-            currentMode === "select" ? setCurrentMode("edit") : setCurrentMode("select");
+            if (currentMode === "select") {
+              setCurrentMode("edit") ;
+            } else {
+              setCurrentMode("select")
+
+            }
           }}
           >
             {currentMode === "select" ? "Current mode: select" : "Current mode: edit"}

@@ -3,14 +3,46 @@ body  {
   color: #f1e1d4;
 }
 
+#textbox {
+  /* color: rgb(255, 159, 159); */
+}
+
+.token {
+  color: #f1e1d4;
+  display: inline-block;
+  z-index: 1;
+}
+
+span.token {
+  position: relative;
+  display: inline-block;
+}
+
 span.token.selected {
   outline: none;
   background-color: #FA6526;
-  color: #f1e1d4;
+  z-index: -1;
 }
 
-span.token.hovering {
-  text-decoration: underline;
-  text-decoration-color: #FA6526;
-  text-decoration-thickness: 1px;
+span.token.hovering::before {
+  content: "";
+  position: absolute;
+  background-color: #fa66262d; /* Updated color without alpha */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Ensure the pseudo-element is behind the content */
+}
+
+span.token.hovering::after {
+  content: ""; /* Create an empty content */
+  display: inline-block; /* Make it a block element */
+  height: 8px; /* Set the height of the underline */
+  width: 100%; /* Make the underline span the full width of the parent */
+  background-color: #FA6526; /* Set the color of the underline */
+  position: absolute; /* Change from relative to absolute */
+  bottom: 0; /* Position the underline at the bottom of the span */
+  left: 0; /* Align the underline with the left edge of the span */
+  z-index: -1; /* Ensure the underline appears behind the span */
 }
