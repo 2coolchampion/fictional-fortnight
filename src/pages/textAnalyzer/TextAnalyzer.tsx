@@ -87,7 +87,6 @@ const TextAnalyzer = () => {
           const range = document.createRange();
           console.log('first child of newSpan1', newSpan1.firstChild)
           range.setStart(newSpan1.firstChild, newSpan1.textContent.length); // Set the start of the range to the end of newSpan1
-          range.setEnd(newSpan1.firstChild, 0); // Set the end of the range to the start of newSpan2
           selection.addRange(range); // Add the new range
 
           newSpan1.after(newSpan2);
