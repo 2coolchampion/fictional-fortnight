@@ -94,9 +94,6 @@ const TextAnalyzer = () => {
     }
   };
 
-  const handleCombining = () => {
-      }
-
 
   const handleSendToFastAPI = () => {
     const textBox = document.getElementById("textbox");
@@ -214,6 +211,34 @@ useEffect(() => {
     };
 }, []);
 
+const handlehighlightNeighbours = (e) => {
+  const selectedToken = document.getElementsByClassName("selected")[0];
+  if (selectedToken) {
+    const prevToken = selectedToken.previousElementSibling;
+    const nextToken = selectedToken.nextElementSibling;
+    if (prevToken) {
+      prevToken.classList.add("combine-target");
+    }
+    if (nextToken) {
+      nextToken.classList.add("combine-target");
+    }
+  }
+}
+
+const handleRemoveHighlightedNeighbours = (e) => {
+  const selectedToken = document.getElementsByClassName("selected")[0];
+  if (selectedToken) {
+    const prevToken = selectedToken.previousElementSibling;
+    const nextToken = selectedToken.nextElementSibling;
+    if (prevToken) {
+      prevToken.classList.remove("combine-target");
+    }
+    if (nextToken) {
+      nextToken.classList.remove("combine-target");
+    }
+  }
+}
+
 
 
   return (
@@ -228,16 +253,40 @@ useEffect(() => {
         contentEditable
         className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
         onKeyDown={ (e) => {
-          if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            if (currentMode === "edit") {
-              handleSplitting(e);
-              // handleCombining(e)
-            }
+          if (currentMode !== "edit") {
+            return
           }
+
+          if (e.ctrlKey && e.key === 's') {
+
+            e.preventDefault();
+              handleSplitting(e);
+          } else if (e.ctrlKey && e.key === 'c') {
+
+            e.preventDefault();
+            handlehighlightNeighbours(e);
+            // TODO !!!
+            // merges the selected token with the sibling next to it
+
+            // if (e.key === 'leftArrow') {
+            //   handleLeftCombine();
+            // }
+            // if (e.key === 'rightArrow') {
+            //   handleRightCombine();
+            }
             
           }
         }
+        onKeyUp={(e) => {
+          if (currentMode !== "edit") {
+            return
+          }
+
+          if (e.ctrlKey && e.key === 'c') {
+            e.preventDefault();
+            handleRemoveHighlightedNeighbours(e);
+          }
+        }}
         onMouseDown={(e) => {
           if (currentMode === "edit") {
             handleMouseDown(e);
