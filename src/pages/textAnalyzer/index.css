@@ -1,0 +1,16 @@
+body  {
+  background-color: rgb(37, 30, 21);
+  color: #f1e1d4;
+}
+
+span.token.selected {
+  outline: none;
+  background-color: #FA6526;
+  color: #f1e1d4;
+}
+
+span.token.hovering {
+  text-decoration: underline;
+  text-decoration-color: #FA6526;
+  text-decoration-thickness: 1px;
+}
