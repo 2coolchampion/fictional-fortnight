@@ -142,35 +142,27 @@ const TextAnalyzer = () => {
   const handleMouseDown = (e) => {
     const target = e.target;
 
-    // remove selected class
-    if (target.classList.contains('selected')) {
-      const isItTheSameToken = lastSelectedTokenRef.current === target
-      if (!isItTheSameToken) {
-        target.classList.remove("selected");
-      }
-    } else {
-      // add selected class
-      if (target.tagName==="SPAN" && target.classList.contains("token")) {
-        target.classList.add("selected");
-        
-        if (target.classList.contains("hovering")) {
-          target.classList.remove("hovering");
-        };
-        lastSelectedTokenRef.current = target;
-        useSelectionCountRef.current += 1;
+    // add selected class
+    if (target.tagName==="SPAN" && target.classList.contains("token")) {
+      target.classList.add("selected");
+      
+      if (target.classList.contains("hovering")) {
+        target.classList.remove("hovering");
       };
+      lastSelectedTokenRef.current = target;
+      useSelectionCountRef.current += 1;
+    };
 
-      if (useSelectionCountRef.current > 1 ) {
-        //find other selected tags and remove them.
-        const selectedTags = document.getElementsByClassName("selected");
-        for (let i = 0; i < selectedTags.length; i++) {
-          if (selectedTags[i] !== target) {
-            selectedTags[i].classList.remove("selected");
-          }
+    if (useSelectionCountRef.current > 1 ) {
+      //find other selected tags and remove them.
+      const selectedTags = document.getElementsByClassName("selected");
+      for (let i = 0; i < selectedTags.length; i++) {
+        if (selectedTags[i] !== target) {
+          selectedTags[i].classList.remove("selected");
         }
-
       }
-    } 
+
+    }
   };
 
   const handleMouseOver = (e) => {
