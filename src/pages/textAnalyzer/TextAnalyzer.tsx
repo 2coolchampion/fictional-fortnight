@@ -142,6 +142,17 @@ const TextAnalyzer = () => {
   const handleMouseDown = (e) => {
     const target = e.target;
 
+    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token
+    const previousSibling = lastSelectedTokenRef.current?.previousElementSibling;
+    if (previousSibling) {
+      previousSibling.classList.remove("combine-target");
+    }
+    
+    const nextSibling = lastSelectedTokenRef.current?.nextElementSibling;
+    if (nextSibling) {
+      nextSibling.classList.remove("combine-target");
+    }
+
     // add selected class
     if (target.tagName==="SPAN" && target.classList.contains("token")) {
       target.classList.add("selected");
