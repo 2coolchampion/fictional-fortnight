@@ -23,7 +23,7 @@ span.token.selected {
 span.token.hovering::before {
   content: "";
   position: absolute;
-  background-color: #fa66262d; /* Updated color without alpha */
+  background-color: #fa662675; /* Updated color without alpha */
   bottom: 0;
   left: 0;
   width: 100%;
@@ -47,4 +47,8 @@ span.token.hovering::after {
 
 .combine-target {
   background-color: #b83d08;
+}
+
+::selection {
+  background-color: #d54000;
 }
