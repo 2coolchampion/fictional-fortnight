@@ -11,6 +11,7 @@ const TextAnalyzer = () => {
   const [selectedText, setSelectedText] = useState<string>('');
   let lastSelectedTokenRef = useRef(null)
   const useSelectionCountRef = useRef(0);
+  let IscombiningModeEngaged = useRef(false)
 
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -147,7 +148,7 @@ const TextAnalyzer = () => {
     if (previousSibling) {
       previousSibling.classList.remove("combine-target");
     }
-    
+
     const nextSibling = lastSelectedTokenRef.current?.nextElementSibling;
     if (nextSibling) {
       nextSibling.classList.remove("combine-target");
@@ -226,6 +227,7 @@ const handlehighlightNeighbours = (e) => {
       nextToken.classList.add("combine-target");
     }
   }
+  IscombiningModeEngaged.current = true;
 }
 
 const handleRemoveHighlightedNeighbours = (e) => {
@@ -233,16 +235,40 @@ const handleRemoveHighlightedNeighbours = (e) => {
   if (selectedToken) {
     const prevToken = selectedToken.previousElementSibling;
     const nextToken = selectedToken.nextElementSibling;
-    if (prevToken) {
+    if (prevToken && prevToken.classList.contains("combine-target")) {
       prevToken.classList.remove("combine-target");
     }
-    if (nextToken) {
+    if (nextToken && nextToken.classList.contains("combine-target")) {
       nextToken.classList.remove("combine-target");
     }
   }
+  IscombiningModeEngaged.current = false;
 }
 
+const handleCombining = (side: 'left' | 'right') => {
+  if (side === 'left') {
+    const selectedToken = document.getElementsByClassName("selected")[0];
+    const prevToken = selectedToken.previousElementSibling;
+    
 
+    // add text from token being merged to the selected token
+    (selectedToken as HTMLElement).innerText += (prevToken as HTMLElement).innerText;
+
+    // remove token being merged
+    (prevToken as HTMLElement).remove();
+    
+    } else {
+    const selectedToken = document.getElementsByClassName("selected")[0];
+    const nextToken = selectedToken.nextElementSibling;
+    
+
+    // add text from token being merged to the selected token
+    (selectedToken as HTMLElement).innerText += (nextToken as HTMLElement).innerText;
+
+    // remove token being merged
+    (nextToken as HTMLElement).remove();
+    }
+}
 
   return (
     <>
@@ -255,31 +281,37 @@ const handleRemoveHighlightedNeighbours = (e) => {
         ref={(node) => (textboxRef.current = node)}
         contentEditable
         className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
-        onKeyDown={ (e) => {
+        onKeyDown={(e: React.KeyboardEvent) => {
           if (currentMode !== "edit") {
-            return
+            return;
           }
-
+        
           if (e.ctrlKey && e.key === 's') {
-
             e.preventDefault();
-              handleSplitting(e);
+            handleSplitting(e);
           } else if (e.ctrlKey && e.key === 'c') {
-
             e.preventDefault();
             handlehighlightNeighbours(e);
-            // TODO !!!
-            // merges the selected token with the sibling next to it
-
-            // if (e.key === 'leftArrow') {
-            //   handleLeftCombine();
-            // }
-            // if (e.key === 'rightArrow') {
-            //   handleRightCombine();
-            }
+        
             
+
+            console.log(e.ctrlKey ,"key", e.key);
           }
-        }
+
+          if (IscombiningModeEngaged.current) {
+            e.preventDefault()
+
+            switch (e.key) {
+              case 'ArrowLeft':
+                handleCombining('left');
+                break;
+              case 'ArrowRight':
+                handleCombining('right');
+                break;
+            }
+          }
+
+        }}        
         onKeyUp={(e) => {
           if (currentMode !== "edit") {
             return
@@ -311,19 +343,19 @@ const handleRemoveHighlightedNeighbours = (e) => {
         className="flex justify-between w-1/2"
         >
           <button
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-yellow-800 px-2"
+          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
           onClick={addText}
           >
             Paste
           </button>
           <button 
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-yellow-800 px-2"
+          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
           onClick={handleSendToFastAPI}
           >
             Scan
           </button>
           <button 
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-yellow-800 px-2"
+          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
           onClick={() => {
             if (currentMode === "select") {
               setCurrentMode("edit") ;
