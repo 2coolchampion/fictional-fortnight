@@ -353,17 +353,40 @@ const handleCombining = (side: 'left' | 'right') => {
             Scan
           </button>
           <button 
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
+          className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editTokenList' ? 'bg-purple-900' : ''}`}
           onClick={() => {
-            if (currentMode === "select") {
-              setCurrentMode("editToken") ;
-            } else {
-              setCurrentMode("select")
-
-            }
+            switch (currentMode) {
+              case "editTokenList":
+                setCurrentMode("select");
+                break;
+              case "editToken":
+                setCurrentMode("editTokenList");
+                break;
+              case "select":
+                setCurrentMode("editTokenList");
+                break;
+            };
           }}
           >
-            {currentMode === "select" ? "Current mode: select" : "Current mode: edit"}
+            Edit token Lists
+          </button>
+          <button 
+          className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editToken' ? 'bg-purple-900' : ''}`}
+          onClick={() => {
+            switch (currentMode) {
+              case "editTokenList":
+                setCurrentMode("editToken");
+                break;
+              case "editToken":
+                setCurrentMode("select");
+                break;
+              case "select":
+                setCurrentMode("editToken");
+                break;
+            };
+          }}
+          >
+            Edit tokens
           </button>
         </div>
         <div
