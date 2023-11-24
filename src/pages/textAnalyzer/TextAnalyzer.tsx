@@ -3,7 +3,7 @@ import { getEventListeners } from "events";
 
 const TextAnalyzer = () => {
 
-  const [currentMode, setCurrentMode] = useState("select");
+  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList'>("select");
 
   const [selection, setSelection] = useState<Selection | null>(null);
   const [rangeCount, setRangeCount] = useState<number>(0);
@@ -288,7 +288,7 @@ const handleCombining = (side: 'left' | 'right') => {
         contentEditable
         className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
         onKeyDown={(e: React.KeyboardEvent) => {
-          if (currentMode !== "edit") {
+          if (currentMode !== "editToken") {
             return;
           }
         
@@ -312,29 +312,26 @@ const handleCombining = (side: 'left' | 'right') => {
                 break;
             }
           }
-
         }}        
         onKeyUp={(e) => {
-          if (currentMode !== "edit") {
-            return
-          }
-
-          if (e.ctrlKey && e.key === 'c') {
-            handleRemoveHighlightedNeighbours(e);
+          if (currentMode === "editToken") {
+            if (e.ctrlKey && e.key === 'c') {
+              handleRemoveHighlightedNeighbours(e);
+            }
           }
         }}
         onMouseDown={(e) => {
-          if (currentMode === "edit") {
+          if (currentMode === "editToken") {
             handleMouseDown(e);
           }
         }}
         onMouseOver={(e) => {
-          if (currentMode === "edit") {
+          if (currentMode === "editToken") {
             handleMouseOver(e);
           }
         }}
         onMouseOut={(e) => {
-          if (currentMode === "edit") {
+          if (currentMode === "editToken") {
             handleMouseOut(e);
           }
         }}
@@ -359,7 +356,7 @@ const handleCombining = (side: 'left' | 'right') => {
           className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
           onClick={() => {
             if (currentMode === "select") {
-              setCurrentMode("edit") ;
+              setCurrentMode("editToken") ;
             } else {
               setCurrentMode("select")
 
