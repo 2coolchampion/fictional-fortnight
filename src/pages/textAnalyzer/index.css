@@ -1,7 +1,11 @@
 body  {
-  background-color: rgb(37, 30, 21);
-  color: #f1e1d4;
+  background-color: #331d76;
+  color: #dcd4f1;
+  background-image: url(/src/assets/img/bg-white-lighter.png);
+  background-blend-mode: multiply;
 }
+/* rgb(37, 30, 21) */
+/* #f1e1d4 */
 
 .token {
   color: #f1e1d4;

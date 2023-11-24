@@ -292,10 +292,6 @@ const handleCombining = (side: 'left' | 'right') => {
           } else if (e.ctrlKey && e.key === 'c') {
             e.preventDefault();
             handlehighlightNeighbours(e);
-        
-            
-
-            console.log(e.ctrlKey ,"key", e.key);
           }
 
           if (IscombiningModeEngaged.current) {
