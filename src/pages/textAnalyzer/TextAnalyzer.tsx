@@ -320,7 +320,6 @@ const handleCombining = (side: 'left' | 'right') => {
           }
 
           if (e.ctrlKey && e.key === 'c') {
-            e.preventDefault();
             handleRemoveHighlightedNeighbours(e);
           }
         }}
