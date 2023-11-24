@@ -3,7 +3,8 @@ import { getEventListeners } from "events";
 
 const TextAnalyzer = () => {
 
-  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList'>("select");
+  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>(null);
+  const currentModeRef = useRef<'select' | 'editToken' | 'editTokenList' | null>(currentMode); // This is necessary for the handleSelection eventHandler since value of currentMode state variable is enclosed in the scope of the handleSelection function, and it doesn't get updated when currentMode changes because the function retains a reference to the original value of currentMode from when it was first created. Refs provide a way to persist values across renders without triggering a re-render themselves.
 
   const [selection, setSelection] = useState<Selection | null>(null);
   const [rangeCount, setRangeCount] = useState<number>(0);
@@ -11,6 +12,10 @@ const TextAnalyzer = () => {
   const [selectedText, setSelectedText] = useState<string>('');
   let lastSelectedTokenRef = useRef(null)
   let IscombiningModeEngaged = useRef(false)
+
+  useEffect(() => {
+    currentModeRef.current = currentMode;
+  }, [currentMode]);
 
   useEffect(() => {
 
@@ -40,7 +45,7 @@ const TextAnalyzer = () => {
     
     const handleSelection = () => {
 
-      if (currentMode === 'select') {
+      if (currentModeRef.current === 'select') {
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
           const range = selection.getRangeAt(0);
@@ -356,6 +361,10 @@ const handleCombining = (side: 'left' | 'right') => {
     }
 }
 
+useEffect(() => {
+  console.log('current mode: ',currentMode);
+}, [currentMode]);
+
   return (
     <>
       <div 
@@ -445,6 +454,9 @@ const handleCombining = (side: 'left' | 'right') => {
               case "select":
                 setCurrentMode("editTokenList");
                 break;
+              case null:
+                setCurrentMode("editTokenList");
+                break;
             };
           }}
           >
@@ -461,6 +473,9 @@ const handleCombining = (side: 'left' | 'right') => {
                 setCurrentMode("select");
                 break;
               case "select":
+                setCurrentMode("editToken");
+                break;
+              case null:
                 setCurrentMode("editToken");
                 break;
             };
