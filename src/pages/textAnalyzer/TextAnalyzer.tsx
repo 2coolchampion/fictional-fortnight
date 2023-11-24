@@ -46,7 +46,6 @@ const TextAnalyzer = () => {
           const range = selection.getRangeAt(0);
           const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
           if ((spanElement.tagName) === 'SPAN' && spanElement.classList.contains('token')) {
-            
 
             spanElement.classList.add('selected');
 
@@ -332,7 +331,8 @@ const handleCombining = (side: 'left' | 'right') => {
     
 
     // add text from token being merged to the selected token
-    (selectedToken as HTMLElement).innerText += (prevToken as HTMLElement).innerText;
+    const formattedText = (prevToken as HTMLElement).innerText + (selectedToken as HTMLElement).innerText;
+    (selectedToken as HTMLElement).innerText = formattedText;
 
     // remove token being merged
     (prevToken as HTMLElement).remove();
