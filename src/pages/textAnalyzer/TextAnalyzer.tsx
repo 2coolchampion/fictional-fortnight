@@ -10,10 +10,11 @@ const TextAnalyzer = () => {
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
   let lastSelectedTokenRef = useRef(null)
-  const useSelectionCountRef = useRef(0);
   let IscombiningModeEngaged = useRef(false)
 
   useEffect(() => {
+
+    //display some live-data for debugging purposes
     const handleSelectionChange = () => {
       const newSelection = window.getSelection();
       setSelection(newSelection);
@@ -35,8 +36,46 @@ const TextAnalyzer = () => {
     };
   }, []);
 
+  useEffect(() => {
+    
+    const handleSelection = () => {
+
+      if (currentMode === 'select') {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
+          if ((spanElement.tagName) === 'SPAN' && spanElement.classList.contains('token')) {
+            
+
+            spanElement.classList.add('selected');
+
+            const selectionList = document.getElementsByClassName("selected");
+
+            for (let i = 0; i < selectionList.length; i++) {
+              if (selectionList[i] !== spanElement)
+              selectionList[i].classList.remove("selected");
+            };
+
+            if (spanElement.classList.contains("hovering")) {
+                  spanElement.classList.remove("hovering");
+            };
+                
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('selectionchange', handleSelection);
+
+    return () => {
+      document.removeEventListener('selectionchange', handleSelection);
+    }
+  }, [])
+  
+
  
-  // --- --- ---
+  // --- --- --- 🥱
 
   let textboxRef = useRef<HTMLDivElement>(null); 
   
@@ -50,7 +89,7 @@ const TextAnalyzer = () => {
     }
   }, []);
   
-  // --- --- ---
+  // --- --- --- 🥱
 
   const handleSplitting = (e) => {
 
@@ -141,9 +180,11 @@ const TextAnalyzer = () => {
   };
 
   const handleMouseDown = (e) => {
+    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token combine targets.
+
     const target = e.target;
 
-    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token
+    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token 
     const previousSibling = lastSelectedTokenRef.current?.previousElementSibling;
     if (previousSibling) {
       previousSibling.classList.remove("combine-target");
@@ -154,27 +195,6 @@ const TextAnalyzer = () => {
       nextSibling.classList.remove("combine-target");
     }
 
-    // add selected class
-    if (target.tagName==="SPAN" && target.classList.contains("token")) {
-      target.classList.add("selected");
-      
-      if (target.classList.contains("hovering")) {
-        target.classList.remove("hovering");
-      };
-      lastSelectedTokenRef.current = target;
-      useSelectionCountRef.current += 1;
-    };
-
-    if (useSelectionCountRef.current > 1 ) {
-      //find other selected tags and remove them.
-      const selectedTags = document.getElementsByClassName("selected");
-      for (let i = 0; i < selectedTags.length; i++) {
-        if (selectedTags[i] !== target) {
-          selectedTags[i].classList.remove("selected");
-        }
-      }
-
-    }
   };
 
   const handleMouseOver = (e) => {
