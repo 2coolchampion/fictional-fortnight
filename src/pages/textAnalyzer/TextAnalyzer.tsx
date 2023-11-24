@@ -289,6 +289,42 @@ const handleRemoveHighlightedNeighbours = (e) => {
   IscombiningModeEngaged.current = false;
 }
 
+useEffect(() => {
+  // Bug -> Without this code, when user changes tab or right-clicks on another token WHILE still holding CTRL + C (combiningMode), the previous and next tokens of the selected token would not get cleared of the .combining-target class.
+  const handleBlur = () => {
+    const prevToken = document.querySelector('.combine-target');
+    if (prevToken) {
+      prevToken.classList.remove('combine-target');
+    }
+    const nextToken = document.querySelector('.combine-target');
+    if (nextToken) {
+      nextToken.classList.remove('combine-target');
+    }
+    IscombiningModeEngaged.current = false;
+  };
+
+  const handleContextMenu = (e) => {
+    const selectedToken = document.querySelector('.selected');
+    const tokens = document.querySelectorAll('.token');
+
+    tokens.forEach((token) => {
+      if (token !== selectedToken) {
+        token.classList.remove('combine-target');
+      }
+    });
+
+    IscombiningModeEngaged.current = false;
+  };
+
+  window.addEventListener('blur', handleBlur);
+  document.addEventListener('contextmenu', handleContextMenu);
+
+  return () => {
+    window.removeEventListener('blur', handleBlur);
+    document.removeEventListener('contextmenu', handleContextMenu);
+  };
+}, []);
+
 const handleCombining = (side: 'left' | 'right') => {
   if (side === 'left') {
     const selectedToken = document.getElementsByClassName("selected")[0];
