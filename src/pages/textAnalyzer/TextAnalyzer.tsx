@@ -3,7 +3,7 @@ import { getEventListeners } from "events";
 
 const TextAnalyzer = () => {
 
-  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList'>("select");
+  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>(null);
 
   const [selection, setSelection] = useState<Selection | null>(null);
   const [rangeCount, setRangeCount] = useState<number>(0);
@@ -356,6 +356,10 @@ const handleCombining = (side: 'left' | 'right') => {
     }
 }
 
+useEffect(() => {
+  console.log('current mode: ',currentMode);
+}, [currentMode]);
+
   return (
     <>
       <div 
@@ -445,6 +449,9 @@ const handleCombining = (side: 'left' | 'right') => {
               case "select":
                 setCurrentMode("editTokenList");
                 break;
+              case null:
+                setCurrentMode("editTokenList");
+                break;
             };
           }}
           >
@@ -461,6 +468,9 @@ const handleCombining = (side: 'left' | 'right') => {
                 setCurrentMode("select");
                 break;
               case "select":
+                setCurrentMode("editToken");
+                break;
+              case null:
                 setCurrentMode("editToken");
                 break;
             };
