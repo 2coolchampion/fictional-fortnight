@@ -256,6 +256,9 @@ const handleCombining = (side: 'left' | 'right') => {
 
     // remove token being merged
     (prevToken as HTMLElement).remove();
+
+    const newPrevToken = selectedToken.previousElementSibling;
+    newPrevToken.classList.add("combine-target");
     
     } else {
     const selectedToken = document.getElementsByClassName("selected")[0];
@@ -267,6 +270,9 @@ const handleCombining = (side: 'left' | 'right') => {
 
     // remove token being merged
     (nextToken as HTMLElement).remove();
+
+    const newNextToken = selectedToken.nextElementSibling;
+    newNextToken.classList.add("combine-target");
     }
 }
 
