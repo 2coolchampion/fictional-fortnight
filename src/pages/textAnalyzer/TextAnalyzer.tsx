@@ -161,7 +161,7 @@ const TextAnalyzer = () => {
     
           // Add the token as a span element
           formattedText += 
-          `<span data-pos="${tokenInfo.pos}" data-dependency="${tokenInfo.dependency}" class="token">${tokenInfo.text}</span>`;
+          `<span data-id="${tokenInfo.id}" data-pos="${tokenInfo.pos}" data-dependency="${tokenInfo.dependency}" class="token">${tokenInfo.text}</span>`;
     
           currentIndex = tokenInfo.end;
         });
