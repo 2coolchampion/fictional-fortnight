@@ -3,7 +3,7 @@ import { getEventListeners } from "events";
 
 const TextAnalyzer = () => {
 
-  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>(null);
+  const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>('select');
   const currentModeRef = useRef<'select' | 'editToken' | 'editTokenList' | null>(currentMode); // This is necessary for the handleSelection eventHandler since value of currentMode state variable is enclosed in the scope of the handleSelection function, and it doesn't get updated when currentMode changes because the function retains a reference to the original value of currentMode from when it was first created. Refs provide a way to persist values across renders without triggering a re-render themselves.
 
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -45,7 +45,6 @@ const TextAnalyzer = () => {
     
     const handleSelection = () => {
 
-      if (currentModeRef.current === 'select') {
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
           const range = selection.getRangeAt(0);
@@ -66,7 +65,6 @@ const TextAnalyzer = () => {
             };
                 
           }
-        }
       }
     };
     
