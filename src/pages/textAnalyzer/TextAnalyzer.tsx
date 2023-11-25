@@ -360,10 +360,6 @@ const handleCombining = (side: 'left' | 'right') => {
     }
 }
 
-useEffect(() => {
-  console.log('current mode: ',currentMode);
-}, [currentMode]);
-
   return (
     <>
       <div 
@@ -403,7 +399,6 @@ useEffect(() => {
           }
         }}
         onKeyUpCapture={(e) => {
-          console.log('key up capture');
           const firstCondition = e.ctrlKey && e.key === 'c';
           const secondCondition = e.key === 'c' && e.ctrlKey;
           if (firstCondition || secondCondition) {
