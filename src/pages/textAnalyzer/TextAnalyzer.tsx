@@ -12,6 +12,7 @@ const TextAnalyzer = () => {
   const [selectedText, setSelectedText] = useState<string>('');
   let lastSelectedTokenRef = useRef(null)
   let IscombiningModeEngaged = useRef(false)
+  let isCTRLPressed = useRef(false)
 
   useEffect(() => {
     currentModeRef.current = currentMode;
@@ -374,7 +375,7 @@ useEffect(() => {
         ref={(node) => (textboxRef.current = node)}
         contentEditable
         className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
-        onKeyDown={(e: React.KeyboardEvent) => {
+        onKeyDownCapture={(e: React.KeyboardEvent) => {
           if (currentMode !== "editToken") {
             return;
           }
@@ -385,6 +386,7 @@ useEffect(() => {
           } else if (e.ctrlKey && e.key === 'c') {
             e.preventDefault();
             handlehighlightNeighbours(e);
+            isCTRLPressed.current = true;
           }
 
           if (IscombiningModeEngaged.current) {
@@ -399,11 +401,18 @@ useEffect(() => {
                 break;
             }
           }
-        }}        
-        onKeyUp={(e) => {
+        }}
+        onKeyUpCapture={(e) => {
+          console.log('key up capture');
+          const firstCondition = e.ctrlKey && e.key === 'c';
+          const secondCondition = e.key === 'c' && e.ctrlKey;
+          if (firstCondition || secondCondition) {
+            e.preventDefault();
+          }
           if (currentMode === "editToken") {
-            if (e.ctrlKey && e.key === 'c') {
+            if ((isCTRLPressed && e.key === 'c') ) {
               handleRemoveHighlightedNeighbours(e);
+              isCTRLPressed.current = false;
             }
           }
         }}
