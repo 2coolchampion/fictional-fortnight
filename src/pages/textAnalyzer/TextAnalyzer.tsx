@@ -182,7 +182,7 @@ const TextAnalyzer = () => {
   };
 
   const handleMouseDown = (e) => {
-    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token combine targets.
+    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token combine targets. So we need to remove them manually
 
     const target = e.target;
 
