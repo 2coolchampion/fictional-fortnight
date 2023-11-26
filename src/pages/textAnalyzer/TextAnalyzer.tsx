@@ -10,6 +10,7 @@ const TextAnalyzer = () => {
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
+  const [selectedTokenList, setSelectedTokenList] = useState<Element[] | null>([]);
   let lastSelectedTokenRef = useRef(null)
   let IscombiningModeEngaged = useRef(false)
   let isCTRLPressed = useRef(false)
@@ -43,45 +44,76 @@ const TextAnalyzer = () => {
   }, []);
 
   useEffect(() => {
-    
+
     const handleSelection = () => {
+      // NOTE: Remember to use currentModeRef.current instead of state variable currentMode
 
         const selection = window.getSelection();
+
+        // add or remove selection class
         if (selection && selection.rangeCount > 0) {
           const range = selection.getRangeAt(0);
           const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
-          if ((spanElement.tagName) === 'SPAN' && spanElement.classList.contains('token')) {
+          const isSpanElementToken = spanElement.classList.contains('token');
+          const isSpanElementSelected = spanElement.classList.contains('selected');
 
-            spanElement.classList.add('selected');
 
-            const selectionList = document.getElementsByClassName("selected");
+          if ((spanElement.tagName) === 'SPAN' && isSpanElementToken) {
 
-            for (let i = 0; i < selectionList.length; i++) {
-              if (selectionList[i] !== spanElement)
-              selectionList[i].classList.remove("selected");
-            };
+            if (!isSpanElementSelected) {
 
-            if (spanElement.classList.contains("hovering")) {
-                  spanElement.classList.remove("hovering");
-            };
-                
-          }
-      }
-    };
+              spanElement.classList.add('selected');
+
+              if (spanElement.classList.contains("hovering")) {
+                spanElement.classList.remove("hovering");
+              };
+  
+              const selectionList = document.getElementsByClassName("selected");
+  
+              if (currentModeRef.current !== 'editTokenList') {
+                for (let i = 0; i < selectionList.length; i++) {
+                  if (selectionList[i] !== spanElement)
+                  selectionList[i].classList.remove("selected");
+                };
+              }
+            }
+
+            // Add selected to token list
+            if (currentModeRef.current === 'editTokenList') {
+  
+              if (isSpanElementSelected) {
+                spanElement.classList.remove("selected");
+              }
     
+              let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
+              // console.log(document.getElementsByClassName("selected"));
+              // console.log(selectionList);
+              if (selectedTokenList.includes(spanElement)) {
+                // remove from list
+                // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
+  
+                // remove from list usinf filter method
+                setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
+              }          
+              setSelectedTokenList(selectedTokens);
+            };
+          }
+        }
+      }
+
     document.addEventListener('selectionchange', handleSelection);
 
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
     }
   }, [])
+
   
 
- 
   // --- --- --- 🥱
 
-  let textboxRef = useRef<HTMLDivElement>(null); 
-  
+  let textboxRef = useRef<HTMLDivElement>(null);
+
   // initialized textboxRef on componentDidMount since textbox is not available on componentHasRendered on first mount.
 
   useEffect(() => {
@@ -91,7 +123,7 @@ const TextAnalyzer = () => {
       textboxRef.current.focus();
     }
   }, []);
-  
+
   // --- --- --- 🥱
 
   const handleSplitting = (e) => {
@@ -102,26 +134,26 @@ const TextAnalyzer = () => {
       const selection = window.getSelection();
       const range = selection.getRangeAt(0);
       const spanElement = range.commonAncestorContainer.parentElement;
-  
+
       // Check if the caret is inside the span element
       if (spanElement.className.includes('token')) {
         const text = spanElement.innerText;
         const caretOffset = range.startOffset;
-  
+
         // Check if the caret position is not at the start or end of the text
         if (caretOffset > 0 && caretOffset < text.length) {
           const beforeText = text.slice(0, caretOffset);
           const afterText = text.slice(caretOffset);
-  
+
           // Create two new span elements with the 'token' class
           const newSpan1 = document.createElement('span');
           newSpan1.className = 'token';
           newSpan1.innerText = beforeText;
-  
+
           const newSpan2 = document.createElement('span');
           newSpan2.className = 'token';
           newSpan2.innerText = afterText;
-  
+
           // Replace the original span element with the two new span elements
           spanElement.parentNode.replaceChild(newSpan1, spanElement);
 
@@ -154,21 +186,21 @@ const TextAnalyzer = () => {
         let originalText = document.getElementById("textbox").innerText;
         let formattedText = "";
         let currentIndex = 0;
-    
+
         data.forEach(tokenInfo => {
           // Add the text before the token
           formattedText += originalText.slice(currentIndex, tokenInfo.start);
-    
+
           // Add the token as a span element
-          formattedText += 
+          formattedText +=
           `<span data-id="${tokenInfo.id}" data-pos="${tokenInfo.pos}" data-dependency="${tokenInfo.dependency}" class="token">${tokenInfo.text}</span>`;
-    
+
           currentIndex = tokenInfo.end;
         });
-    
+
         // Add any remaining text after the last token
         formattedText += originalText.slice(currentIndex);
-    
+
         // Replace the original text with the formatted text
         document.getElementById("textbox").innerHTML = formattedText;
 
@@ -187,7 +219,7 @@ const TextAnalyzer = () => {
 
     const target = e.target;
 
-    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token 
+    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token
     const previousSibling = lastSelectedTokenRef.current?.previousElementSibling;
     if (previousSibling) {
       previousSibling.classList.remove("combine-target");
@@ -238,7 +270,7 @@ const handleClickOutside = (e: MouseEvent) => {
         if (nextToken && nextToken.classList.contains("combine-target")) {
           nextToken.classList.remove("combine-target");
         }
-        
+
         IscombiningModeEngaged.current = false;
       }
     }
@@ -250,7 +282,7 @@ const handleClickOutside = (e: MouseEvent) => {
     }
   }
 
-  
+
 };
 
 
@@ -332,7 +364,7 @@ const handleCombining = (side: 'left' | 'right') => {
   if (side === 'left') {
     const selectedToken = document.getElementsByClassName("selected")[0];
     const prevToken = selectedToken.previousElementSibling;
-    
+
 
     // add text from token being merged to the selected token
     const formattedText = (prevToken as HTMLElement).innerText + (selectedToken as HTMLElement).innerText;
@@ -343,11 +375,11 @@ const handleCombining = (side: 'left' | 'right') => {
 
     const newPrevToken = selectedToken.previousElementSibling;
     newPrevToken.classList.add("combine-target");
-    
+
     } else {
     const selectedToken = document.getElementsByClassName("selected")[0];
     const nextToken = selectedToken.nextElementSibling;
-    
+
 
     // add text from token being merged to the selected token
     (selectedToken as HTMLElement).innerText += (nextToken as HTMLElement).innerText;
@@ -362,11 +394,11 @@ const handleCombining = (side: 'left' | 'right') => {
 
   return (
     <>
-      <div 
+      <div
       className="main-container flex flex-col justify-center items-center w-full h-full mt-10"
       ref={mainContainerRef}
       >
-        <div 
+        <div
         id="textbox"
         ref={(node) => (textboxRef.current = node)}
         contentEditable
@@ -375,7 +407,7 @@ const handleCombining = (side: 'left' | 'right') => {
           if (currentMode !== "editToken") {
             return;
           }
-        
+
           if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
             handleSplitting(e);
@@ -437,13 +469,13 @@ const handleCombining = (side: 'left' | 'right') => {
           >
             Paste
           </button>
-          <button 
+          <button
           className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
           onClick={handleSendToFastAPI}
           >
             Scan
           </button>
-          <button 
+          <button
           className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editTokenList' ? 'bg-purple-900' : ''}`}
           onClick={() => {
             switch (currentMode) {
@@ -464,7 +496,7 @@ const handleCombining = (side: 'left' | 'right') => {
           >
             Edit token Lists
           </button>
-          <button 
+          <button
           className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editToken' ? 'bg-purple-900' : ''}`}
           onClick={() => {
             switch (currentMode) {
