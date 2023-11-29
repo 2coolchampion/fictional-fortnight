@@ -45,15 +45,20 @@ const TextAnalyzer = () => {
 
   useEffect(() => {
 
-    const handleSelection = () => {
+    const selection = window.getSelection();
+
+    // const handleSelectionAndMultiSelect = (e) => {
+
+      const handleSelection = (e) => {
       // NOTE: Remember to use currentModeRef.current instead of state variable currentMode
 
-        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
 
         // add or remove selection class
-        if (selection && selection.rangeCount > 0) {
+
           const range = selection.getRangeAt(0);
           const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
+
           const isSpanElementToken = spanElement.classList.contains('token');
           const isSpanElementSelected = spanElement.classList.contains('selected');
 
@@ -61,7 +66,6 @@ const TextAnalyzer = () => {
           if ((spanElement.tagName) === 'SPAN' && isSpanElementToken) {
 
             if (!isSpanElementSelected) {
-
               spanElement.classList.add('selected');
 
               if (spanElement.classList.contains("hovering")) {
@@ -78,36 +82,148 @@ const TextAnalyzer = () => {
               }
             }
 
-            // Add selected to token list
-            if (currentModeRef.current === 'editTokenList') {
-  
-              if (isSpanElementSelected) {
-                spanElement.classList.remove("selected");
-              }
-    
-              let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
-              // console.log(document.getElementsByClassName("selected"));
-              // console.log(selectionList);
-              if (selectedTokenList.includes(spanElement)) {
-                // remove from list
-                // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
-  
-                // remove from list usinf filter method
-                setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
-              }          
-              setSelectedTokenList(selectedTokens);
-            };
           }
+      }
+
+      type SelectionDirection = 'backward' | 'forward'
+
+      const getSelectionDirection = () => {
+        // dones't include cases where selection is within same node. 
+      
+        const sel = window.getSelection();
+
+        if (!sel) {
+          return
+        };
+
+        if (sel.rangeCount === 0) {
+          return
+        };
+
+        const anchorNode = sel.anchorNode;
+        const focusNode = sel.focusNode;
+
+        const position = anchorNode.compareDocumentPosition(focusNode);
+
+        if (!position && sel.anchorOffset < sel.focusOffset || position === Node.DOCUMENT_POSITION_PRECEDING) {
+          return 'backward'
+        } else {
+          return 'forward'
         }
       }
 
+      const handleMultiSelect = (e) => {
+        const sel = document.getSelection();
+
+        if (!sel || !sel.getRangeAt(0)) {
+          return;
+        }
+
+        const anchorNode = sel.anchorNode.parentElement as Element;
+        const focusNode = sel.focusNode.parentElement as Element;
+
+        
+        if (
+          anchorNode === focusNode ||
+          !anchorNode ||
+          !focusNode ||
+          !anchorNode.classList ||
+          !focusNode.classList ||
+          (!anchorNode.classList.contains("token") ||
+          !focusNode.classList.contains("token"))
+          ) {
+            return;
+          }
+
+
+      
+          anchorNode.classList.add('selected');
+
+          const selectNextSibling = (currentSpan: Element, finalSpan: Element) => {
+            currentSpan.classList.add('selected');
+  
+            const nextSibbling: Element = currentSpan.nextElementSibling;
+  
+            if (nextSibbling !== finalSpan) {
+              nextSibbling.classList.add('selected');
+              selectNextSibling(nextSibbling, finalSpan);
+            } else {
+              finalSpan.classList.add('selected');
+            }
+          }
+  
+          const selectPrevSibling = (currentSpan: Element, finalSpan: Element) => {
+            currentSpan.classList.add('selected');
+  
+            const prevSibbling: Element = currentSpan.nextElementSibling;
+  
+            if (prevSibbling !== finalSpan) {
+              prevSibbling.classList.add('selected');
+              selectPrevSibling(prevSibbling, finalSpan);
+            } else {
+              finalSpan.classList.add('selected');
+            }
+          }
+  
+          const Direction = getSelectionDirection();
+  
+          if (Direction === 'forward')
+            selectNextSibling(anchorNode, focusNode);
+          else {
+            selectPrevSibling(focusNode, anchorNode);
+          }
+    }
+
     document.addEventListener('selectionchange', handleSelection);
+    document.addEventListener('mouseup', handleMultiSelect);
 
     return () => {
       document.removeEventListener('selectionchange', handleSelection);
+      document.removeEventListener('mouseup', handleMultiSelect);
     }
   }, [])
 
+  useEffect(() => {
+
+    const handleAddToTokenList = () => {
+
+      const selection = window.getSelection();
+  
+      if (!selection || selection.rangeCount === 0) return;
+  
+      // add or remove selection class
+  
+      const range = selection.getRangeAt(0);
+      const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
+  
+      const isSpanElementToken = spanElement.classList.contains('token');
+      const isSpanElementSelected = spanElement.classList.contains('selected');
+  
+      // Add selected to token list
+      if (currentModeRef.current === 'editTokenList') {
+
+        // spanElement.classList.remove("selected");
+  
+        let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
+        // console.log(document.getElementsByClassName("selected"));
+        // console.log(selectionList);
+        if (selectedTokenList.includes(spanElement)) {
+          // remove from list
+          // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
+  
+          // remove from list usinf filter method
+          setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
+        }          
+        setSelectedTokenList(selectedTokens);
+      };
+    };
+
+    document.addEventListener('mouseup', handleAddToTokenList);
+
+    return () => {
+      document.removeEventListener('mouseup', handleAddToTokenList);
+    }
+    }, []);
   
 
   // --- --- --- 🥱
@@ -215,7 +331,7 @@ const TextAnalyzer = () => {
   };
 
   const handleMouseDown = (e) => {
-    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token combine targets. So we need to remove them manually
+    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token's combine targets. So we need to remove them manually
 
     const target = e.target;
 
@@ -250,6 +366,10 @@ const mainContainerRef = useRef<HTMLDivElement>(null);
 
 const handleClickOutside = (e: MouseEvent) => {
 
+  if ( currentModeRef.current === "editTokenList") {
+    return;
+  }
+
   const target = e.target as HTMLElement;
   const selectedSpans = document.getElementsByClassName("selected")
 
@@ -259,7 +379,7 @@ const handleClickOutside = (e: MouseEvent) => {
     selectedSpans.length > 0
   ) {
     //Remove combining-target class if user was in combining mode
-    if (true) {
+    if (IscombiningModeEngaged.current) {
       const selectedToken = document.getElementsByClassName("selected")[0];
       if (selectedToken) {
         const prevToken = selectedToken.previousElementSibling;
@@ -444,19 +564,24 @@ const handleCombining = (side: 'left' | 'right') => {
           }
         }}
         onMouseDown={(e) => {
-          if (currentMode === "editToken") {
+          if (currentModeRef.current === "editToken") {
             handleMouseDown(e);
           }
         }}
         onMouseOver={(e) => {
-          if (currentMode === "editToken") {
+          if (currentModeRef.current === "editToken") {
             handleMouseOver(e);
           }
         }}
         onMouseOut={(e) => {
-          if (currentMode === "editToken") {
-            handleMouseOut(e);
+          const target = e.target as Element;
+
+          if (target.tagName==="SPAN" && target.classList.contains("token")) {
+            if (currentModeRef.current === "editToken") {
+              handleMouseOut(e);
+            }
           }
+          
         }}
         >
         </div>
