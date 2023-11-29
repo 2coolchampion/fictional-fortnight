@@ -287,12 +287,12 @@ const handleClickOutside = (e: MouseEvent) => {
 
 
 useEffect(() => {
-  document.addEventListener('click', handleClickOutside);
+  document.addEventListener('mousedown', handleClickOutside);
 
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-}, []);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+  }, []);
 
 const handlehighlightNeighbours = (e) => {
   const selectedToken = document.getElementsByClassName("selected")[0];
