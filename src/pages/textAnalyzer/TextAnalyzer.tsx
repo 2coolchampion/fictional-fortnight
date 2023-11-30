@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { getEventListeners } from "events";
 import useSelectionHandlers from "./utils/useSelectionHandlers";
+import useTokenListSelection from "./utils/useTokenListSelection";
 
 const TextAnalyzer = () => {
 
@@ -11,7 +11,13 @@ const TextAnalyzer = () => {
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
-  const [selectedTokenList, setSelectedTokenList] = useState<Element[] | null>([]);
+  
+  const {selectedTokenList} = useTokenListSelection(currentModeRef);
+
+  useEffect(() => {
+    console.log('Selected Token List:', selectedTokenList);
+  }, [selectedTokenList]);
+
   let lastSelectedTokenRef = useRef(null)
   let IscombiningModeEngaged = useRef(false)
   let isCTRLPressed = useRef(false)
@@ -46,47 +52,47 @@ const TextAnalyzer = () => {
     };
   }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const handleAddToTokenList = () => {
+  //   const handleAddToTokenList = () => {
 
-      const selection = window.getSelection();
+  //     const selection = window.getSelection();
   
-      if (!selection || selection.rangeCount === 0) return;
+  //     if (!selection || selection.rangeCount === 0) return;
   
-      // add or remove selection class
+  //     // add or remove selection class
   
-      const range = selection.getRangeAt(0);
-      const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
+  //     const range = selection.getRangeAt(0);
+  //     const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
   
-      const isSpanElementToken = spanElement.classList.contains('token');
-      const isSpanElementSelected = spanElement.classList.contains('selected');
+  //     const isSpanElementToken = spanElement.classList.contains('token');
+  //     const isSpanElementSelected = spanElement.classList.contains('selected');
   
-      // Add selected to token list
-      if (currentModeRef.current === 'editTokenList') {
+  //     // Add selected to token list
+  //     if (currentModeRef.current === 'editTokenList') {
 
-        // spanElement.classList.remove("selected");
+  //       // spanElement.classList.remove("selected");
   
-        let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
-        // console.log(document.getElementsByClassName("selected"));
-        // console.log(selectionList);
-        if (selectedTokenList.includes(spanElement)) {
-          // remove from list
-          // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
+  //       let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
+  //       // console.log(document.getElementsByClassName("selected"));
+  //       // console.log(selectionList);
+  //       if (selectedTokenList.includes(spanElement)) {
+  //         // remove from list
+  //         // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
   
-          // remove from list usinf filter method
-          setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
-        }          
-        setSelectedTokenList(selectedTokens);
-      };
-    };
+  //         // remove from list usinf filter method
+  //         setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
+  //       }          
+  //       setSelectedTokenList(selectedTokens);
+  //     };
+  //   };
 
-    document.addEventListener('mouseup', handleAddToTokenList);
+  //   document.addEventListener('mouseup', handleAddToTokenList);
 
-    return () => {
-      document.removeEventListener('mouseup', handleAddToTokenList);
-    }
-    }, []);
+  //   return () => {
+  //     document.removeEventListener('mouseup', handleAddToTokenList);
+  //   }
+  //   }, []);
   
 
   // --- --- --- 🥱
