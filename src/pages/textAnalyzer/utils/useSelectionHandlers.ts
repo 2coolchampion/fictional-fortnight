@@ -46,7 +46,7 @@ const handleTokenSelection = (spanElement, currentModeRef) => {
 
 }
 
-const useSelection = (currentModeRef) => {
+const useSelectionHandlers = (currentModeRef) => {
   const sel = window.getSelection();
 
   const handleSelection = (e, currentModeRef) => {
@@ -133,4 +133,4 @@ const useSelection = (currentModeRef) => {
 
 }
 
-export default useSelection;
+export default useSelectionHandlers;

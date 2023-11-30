@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getEventListeners } from "events";
-import useSelection from "./utils/useSelection";
+import useSelectionHandlers from "./utils/useSelectionHandlers";
 
 const TextAnalyzer = () => {
 
@@ -16,7 +16,7 @@ const TextAnalyzer = () => {
   let IscombiningModeEngaged = useRef(false)
   let isCTRLPressed = useRef(false)
 
-  useSelection(currentModeRef);
+  useSelectionHandlers(currentModeRef);
 
   useEffect(() => {
     currentModeRef.current = currentMode;
