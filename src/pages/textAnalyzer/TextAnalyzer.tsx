@@ -172,6 +172,8 @@ const TextAnalyzer = () => {
           else {
             selectPrevSibling(focusNode, anchorNode);
           }
+
+          sel.removeAllRanges();
     }
 
     document.addEventListener('selectionchange', handleSelection);
@@ -606,6 +608,11 @@ const handleCombining = (side: 'left' | 'right') => {
             switch (currentMode) {
               case "editTokenList":
                 setCurrentMode("select");
+                const textbox =document.querySelector("#textbox")
+                const selectedSpans = textbox.querySelectorAll(".selected")
+                selectedSpans.forEach((span) => {
+                  span.classList.remove("selected")
+                })
                 break;
               case "editToken":
                 setCurrentMode("editTokenList");
