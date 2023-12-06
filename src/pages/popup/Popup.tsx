@@ -137,7 +137,7 @@ const Popup = () => {
       if (mode === "whitelist" && whitelist.length != 0) {
         registerScript("whitelist");
 
-      } else if (mode === "blacklist" && blacklist.length != 0) {
+      } else if (mode === "blacklist") {
         registerScript("blacklist");
       }
     }
@@ -168,7 +168,7 @@ const Popup = () => {
         };
   
       } else {
-        if (mode === 'whitelist' && blacklist.length != 0) {
+        if (mode === 'whitelist') {
           registerScript("blacklist");
         } else if (mode === 'blacklist' && whitelist.length != 0) {
           registerScript("whitelist");
@@ -297,6 +297,10 @@ const Popup = () => {
     }
   };
 
+  const openInfoPage = () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL("src/pages/textAnalyzer/index.html") });
+  };
+
 
   
   // const onClickRemoveSite = async (site: string) => {
@@ -404,6 +408,8 @@ const Popup = () => {
             <p>JS Files: {script.js.join(", ")}</p>
           </div>
         ))}
+
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded pt-2" onClick={openInfoPage}>Analyzer</button>
 
         {/* <button
           className="text-sm"

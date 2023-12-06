@@ -43,7 +43,7 @@ export default defineConfig({
   build: {
     outDir,
     /** Can slowDown build speed. */
-    // sourcemap: isDev,
+    sourcemap: isDev,
     minify: isProduction,
     reportCompressedSize: isProduction,
     rollupOptions: {
@@ -56,6 +56,7 @@ export default defineConfig({
         popup: resolve(pagesDir, "popup", "index.html"),
         newtab: resolve(pagesDir, "newtab", "index.html"),
         options: resolve(pagesDir, "options", "index.html"),
+        textAnalyzer: resolve(pagesDir, "textAnalyzer", "index.html"),
       },
       output: {
         entryFileNames: "src/pages/[name]/index.js",
