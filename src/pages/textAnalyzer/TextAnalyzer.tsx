@@ -115,7 +115,7 @@ const TextAnalyzer = () => {
       const handleMultiSelect = (e) => {
         const sel = document.getSelection();
 
-        if (!sel || !sel.getRangeAt(0)) {
+        if (!sel || sel.rangeCount === 0) {
           return;
         }
 
