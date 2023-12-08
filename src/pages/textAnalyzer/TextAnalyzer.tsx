@@ -87,10 +87,6 @@ const TextAnalyzer = () => {
     }
   }, [handleSingleTokenSelection, handleMultiTokenSelection])
 
-
-  
-
-
   const handleSplitting = (e) => {
 
     if (e.ctrlKey && e.key === 's') {
@@ -134,9 +130,6 @@ const TextAnalyzer = () => {
     }
   };
 
-
-  
-
   const addText = () => {
     textboxRef.current.innerText = "Here goes another mistake I know I'm going to make tonight. Even If I wanted to. If I was you.";
   };
@@ -171,157 +164,157 @@ const TextAnalyzer = () => {
     if (target.tagName==="SPAN" && target.classList.contains("token")) {
       target.classList.remove("hovering");
     }
-};
+  };
 
-const mainContainerRef = useRef<HTMLDivElement>(null);
+  const mainContainerRef = useRef<HTMLDivElement>(null);
 
-const handleClickOutside = (e: MouseEvent) => {
+  const handleClickOutside = (e: MouseEvent) => {
 
-  if ( currentModeRef.current === "editTokenList") {
-    return;
-  }
+    if ( currentModeRef.current === "editTokenList") {
+      return;
+    }
 
-  const target = e.target as HTMLElement;
-  const selectedSpans = document.getElementsByClassName("selected")
+    const target = e.target as HTMLElement;
+    const selectedSpans = document.getElementsByClassName("selected")
 
-  if (
-    !(target.id === "textbox") &&
-    !target.classList.contains('token') &&
-    selectedSpans.length > 0
-  ) {
-    //Remove combining-target class if user was in combining mode
-    if (IscombiningModeEngaged.current) {
-      const selectedToken = document.getElementsByClassName("selected")[0];
-      if (selectedToken) {
-        const prevToken = selectedToken.previousElementSibling;
-        const nextToken = selectedToken.nextElementSibling;
-        if (prevToken && prevToken.classList.contains("combine-target")) {
-          prevToken.classList.remove("combine-target");
+    if (
+      !(target.id === "textbox") &&
+      !target.classList.contains('token') &&
+      selectedSpans.length > 0
+    ) {
+      //Remove combining-target class if user was in combining mode
+      if (IscombiningModeEngaged.current) {
+        const selectedToken = document.getElementsByClassName("selected")[0];
+        if (selectedToken) {
+          const prevToken = selectedToken.previousElementSibling;
+          const nextToken = selectedToken.nextElementSibling;
+          if (prevToken && prevToken.classList.contains("combine-target")) {
+            prevToken.classList.remove("combine-target");
+          }
+          if (nextToken && nextToken.classList.contains("combine-target")) {
+            nextToken.classList.remove("combine-target");
+          }
+
+          IscombiningModeEngaged.current = false;
         }
-        if (nextToken && nextToken.classList.contains("combine-target")) {
-          nextToken.classList.remove("combine-target");
-        }
+      }
 
-        IscombiningModeEngaged.current = false;
+      // remove .selected class from all selected tokens
+      const selectedSpans = document.getElementsByClassName("selected");
+      for (let i = 0; i < selectedSpans.length; i++) {
+        selectedSpans[i].classList.remove("selected");
       }
     }
 
-    // remove .selected class from all selected tokens
-    const selectedSpans = document.getElementsByClassName("selected");
-    for (let i = 0; i < selectedSpans.length; i++) {
-      selectedSpans[i].classList.remove("selected");
+
+  };
+
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+  const handlehighlightNeighbours = (e) => {
+    const selectedToken = document.getElementsByClassName("selected")[0];
+    if (selectedToken) {
+      const prevToken = selectedToken.previousElementSibling;
+      const nextToken = selectedToken.nextElementSibling;
+      if (prevToken) {
+        prevToken.classList.add("combine-target");
+      }
+      if (nextToken) {
+        nextToken.classList.add("combine-target");
+      }
     }
+    IscombiningModeEngaged.current = true;
   }
 
+  const handleRemoveHighlightedNeighbours = (e) => {
+    const selectedToken = document.getElementsByClassName("selected")[0];
+    if (selectedToken) {
+      const prevToken = selectedToken.previousElementSibling;
+      const nextToken = selectedToken.nextElementSibling;
+      if (prevToken && prevToken.classList.contains("combine-target")) {
+        prevToken.classList.remove("combine-target");
+      }
+      if (nextToken && nextToken.classList.contains("combine-target")) {
+        nextToken.classList.remove("combine-target");
+      }
+    }
+    IscombiningModeEngaged.current = false;
+  }
 
-};
+  useEffect(() => {
+    // Bug -> Without this code, when user changes tab or right-clicks on another token WHILE still holding CTRL + C (combiningMode), the previous and next tokens of the selected token would not get cleared of the .combining-target class.
+    const handleBlur = () => {
+      const prevToken = document.querySelector('.combine-target');
+      if (prevToken) {
+        prevToken.classList.remove('combine-target');
+      }
+      const nextToken = document.querySelector('.combine-target');
+      if (nextToken) {
+        nextToken.classList.remove('combine-target');
+      }
+      IscombiningModeEngaged.current = false;
+    };
 
+    const handleContextMenu = (e) => {
+      const selectedToken = document.querySelector('.selected');
+      const tokens = document.querySelectorAll('.token');
 
-useEffect(() => {
-  document.addEventListener('mousedown', handleClickOutside);
+      tokens.forEach((token) => {
+        if (token !== selectedToken) {
+          token.classList.remove('combine-target');
+        }
+      });
 
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
+      IscombiningModeEngaged.current = false;
+    };
+
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
   }, []);
 
-const handlehighlightNeighbours = (e) => {
-  const selectedToken = document.getElementsByClassName("selected")[0];
-  if (selectedToken) {
-    const prevToken = selectedToken.previousElementSibling;
-    const nextToken = selectedToken.nextElementSibling;
-    if (prevToken) {
-      prevToken.classList.add("combine-target");
-    }
-    if (nextToken) {
-      nextToken.classList.add("combine-target");
-    }
-  }
-  IscombiningModeEngaged.current = true;
-}
+  const handleCombining = (side: 'left' | 'right') => {
+    if (side === 'left') {
+      const selectedToken = document.getElementsByClassName("selected")[0];
+      const prevToken = selectedToken.previousElementSibling;
 
-const handleRemoveHighlightedNeighbours = (e) => {
-  const selectedToken = document.getElementsByClassName("selected")[0];
-  if (selectedToken) {
-    const prevToken = selectedToken.previousElementSibling;
-    const nextToken = selectedToken.nextElementSibling;
-    if (prevToken && prevToken.classList.contains("combine-target")) {
-      prevToken.classList.remove("combine-target");
-    }
-    if (nextToken && nextToken.classList.contains("combine-target")) {
-      nextToken.classList.remove("combine-target");
-    }
-  }
-  IscombiningModeEngaged.current = false;
-}
 
-useEffect(() => {
-  // Bug -> Without this code, when user changes tab or right-clicks on another token WHILE still holding CTRL + C (combiningMode), the previous and next tokens of the selected token would not get cleared of the .combining-target class.
-  const handleBlur = () => {
-    const prevToken = document.querySelector('.combine-target');
-    if (prevToken) {
-      prevToken.classList.remove('combine-target');
-    }
-    const nextToken = document.querySelector('.combine-target');
-    if (nextToken) {
-      nextToken.classList.remove('combine-target');
-    }
-    IscombiningModeEngaged.current = false;
-  };
+      // add text from token being merged to the selected token
+      const formattedText = (prevToken as HTMLElement).innerText + (selectedToken as HTMLElement).innerText;
+      (selectedToken as HTMLElement).innerText = formattedText;
 
-  const handleContextMenu = (e) => {
-    const selectedToken = document.querySelector('.selected');
-    const tokens = document.querySelectorAll('.token');
+      // remove token being merged
+      (prevToken as HTMLElement).remove();
 
-    tokens.forEach((token) => {
-      if (token !== selectedToken) {
-        token.classList.remove('combine-target');
+      const newPrevToken = selectedToken.previousElementSibling;
+      newPrevToken.classList.add("combine-target");
+
+      } else {
+      const selectedToken = document.getElementsByClassName("selected")[0];
+      const nextToken = selectedToken.nextElementSibling;
+
+
+      // add text from token being merged to the selected token
+      (selectedToken as HTMLElement).innerText += (nextToken as HTMLElement).innerText;
+
+      // remove token being merged
+      (nextToken as HTMLElement).remove();
+
+      const newNextToken = selectedToken.nextElementSibling;
+      newNextToken.classList.add("combine-target");
       }
-    });
-
-    IscombiningModeEngaged.current = false;
-  };
-
-  window.addEventListener('blur', handleBlur);
-  document.addEventListener('contextmenu', handleContextMenu);
-
-  return () => {
-    window.removeEventListener('blur', handleBlur);
-    document.removeEventListener('contextmenu', handleContextMenu);
-  };
-}, []);
-
-const handleCombining = (side: 'left' | 'right') => {
-  if (side === 'left') {
-    const selectedToken = document.getElementsByClassName("selected")[0];
-    const prevToken = selectedToken.previousElementSibling;
-
-
-    // add text from token being merged to the selected token
-    const formattedText = (prevToken as HTMLElement).innerText + (selectedToken as HTMLElement).innerText;
-    (selectedToken as HTMLElement).innerText = formattedText;
-
-    // remove token being merged
-    (prevToken as HTMLElement).remove();
-
-    const newPrevToken = selectedToken.previousElementSibling;
-    newPrevToken.classList.add("combine-target");
-
-    } else {
-    const selectedToken = document.getElementsByClassName("selected")[0];
-    const nextToken = selectedToken.nextElementSibling;
-
-
-    // add text from token being merged to the selected token
-    (selectedToken as HTMLElement).innerText += (nextToken as HTMLElement).innerText;
-
-    // remove token being merged
-    (nextToken as HTMLElement).remove();
-
-    const newNextToken = selectedToken.nextElementSibling;
-    newNextToken.classList.add("combine-target");
-    }
-}
+  }
 
   return (
     <>
