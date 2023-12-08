@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
 import { handleCombining, handleSplitting } from "./utils/tokenEventHandlers/keyEvents";
+import { handleBlur, handleContextMenu } from "./utils/bugFixers";
 
 const TextAnalyzer = () => {
   
@@ -207,38 +208,17 @@ const TextAnalyzer = () => {
   }
 
   useEffect(() => {
-    // Bug -> Without this code, when user changes tab or right-clicks on another token WHILE still holding CTRL + C (combiningMode), the previous and next tokens of the selected token would not get cleared of the .combining-target class.
-    const handleBlur = () => {
-      const prevToken = document.querySelector('.combine-target');
-      if (prevToken) {
-        prevToken.classList.remove('combine-target');
-      }
-      const nextToken = document.querySelector('.combine-target');
-      if (nextToken) {
-        nextToken.classList.remove('combine-target');
-      }
-      IscombiningModeEngaged.current = false;
-    };
+    // Bug Fix -> Without this code, when user changes tab or right-clicks on another token WHILE STILL HOLDING CTRL + C 🤦 (in combiningMode), the previous and next tokens of the selected token .combining-target class wouldn't be removed.
 
-    const handleContextMenu = (e) => {
-      const selectedToken = document.querySelector('.selected');
-      const tokens = document.querySelectorAll('.token');
-
-      tokens.forEach((token) => {
-        if (token !== selectedToken) {
-          token.classList.remove('combine-target');
-        }
-      });
-
-      IscombiningModeEngaged.current = false;
-    };
-
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('contextmenu', handleContextMenu);
-
+    const blurHandler = () => handleBlur(IscombiningModeEngaged);
+    const contextMenuHandler = (e) => handleContextMenu(IscombiningModeEngaged);
+  
+    window.addEventListener('blur', blurHandler);
+    document.addEventListener('contextmenu', contextMenuHandler);
+  
     return () => {
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('blur', blurHandler);
+      document.removeEventListener('contextmenu', contextMenuHandler);
     };
   }, []);
 
