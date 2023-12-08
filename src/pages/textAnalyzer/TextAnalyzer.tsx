@@ -1,21 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getEventListeners } from "events";
 import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
 
 const TextAnalyzer = () => {
-
+  
   const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>('select');
   const currentModeRef = useRef<'select' | 'editToken' | 'editTokenList' | null>(currentMode); // This is necessary for the handleSelection eventHandler since value of currentMode state variable is enclosed in the scope of the handleSelection function, and it doesn't get updated when currentMode changes because the function retains a reference to the original value of currentMode from when it was first created. Refs provide a way to persist values across renders without triggering a re-render themselves.
-
+  
   const [selection, setSelection] = useState<Selection | null>(null);
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
   const [selectedText, setSelectedText] = useState<string>('');
+  
   const [selectedTokenList, setSelectedTokenList] = useState<Element[] | null>([]);
+  
   let lastSelectedTokenRef = useRef(null)
   let IscombiningModeEngaged = useRef(false)
   let isCTRLPressed = useRef(false)
+  
+  // --- --- --- 🥱
+  
+  let textboxRef = useRef<HTMLDivElement>(null);
+  
+  // initialized textboxRef on componentDidMount since textbox is not available on componentHasRendered on first mount.
+  
+  useEffect(() => {
+    const textboxElement = document.getElementById("textbox");
+    textboxRef.current = textboxElement as HTMLDivElement;
+    if (textboxRef.current) {
+      textboxRef.current.focus();
+    }
+  }, []);
+  
+  // --- --- --- 🥱
 
   useEffect(() => {
     currentModeRef.current = currentMode;
@@ -107,21 +124,6 @@ const TextAnalyzer = () => {
     }, []);
   
 
-  // --- --- --- 🥱
-
-  let textboxRef = useRef<HTMLDivElement>(null);
-
-  // initialized textboxRef on componentDidMount since textbox is not available on componentHasRendered on first mount.
-
-  useEffect(() => {
-    const textboxElement = document.getElementById("textbox");
-    textboxRef.current = textboxElement as HTMLDivElement;
-    if (textboxRef.current) {
-      textboxRef.current.focus();
-    }
-  }, []);
-
-  // --- --- --- 🥱
 
   const handleSplitting = (e) => {
 
