@@ -3,6 +3,7 @@ import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
 import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting } from "./utils/tokenEventHandlers/keyEvents";
 import { handleBlur, handleContextMenu } from "./utils/bugFixers";
+import { handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
 
 const TextAnalyzer = () => {
   
@@ -93,23 +94,6 @@ const TextAnalyzer = () => {
     textboxRef.current.innerText = "Here goes another mistake I know I'm going to make tonight. Even If I wanted to. If I was you.";
   };
 
-  const handleMouseDown = (e) => {
-    // When token is selected and user is in combining mode (actively holding CTRL + C) and decides to click on a different token, the .combine-target class won't be automatically removed from the previously selected token's combine targets. So we need to remove them manually
-
-    const target = e.target;
-
-    // // clear combining-target class from *soon to be* PREVIOUSLY SELECTED token
-    const previousSibling = lastSelectedTokenRef.current?.previousElementSibling;
-    if (previousSibling) {
-      previousSibling.classList.remove("combine-target");
-    }
-
-    const nextSibling = lastSelectedTokenRef.current?.nextElementSibling;
-    if (nextSibling) {
-      nextSibling.classList.remove("combine-target");
-    }
-
-  };
 
   const handleMouseOver = (e) => {
       const target = e.target;
@@ -260,7 +244,7 @@ const TextAnalyzer = () => {
         }}
         onMouseDown={(e) => {
           if (currentModeRef.current === "editToken") {
-            handleMouseDown(e);
+            handleMouseDown(e, lastSelectedTokenRef);
           }
         }}
         onMouseOver={(e) => {
