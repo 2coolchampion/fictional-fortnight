@@ -72,3 +72,18 @@ export const handleCombining = (side: 'left' | 'right') => {
     newNextToken.classList.add("combine-target");
     }
 }
+
+export const handleRemoveHighlightedNeighbours = (e, IscombiningModeEngaged) => {
+  const selectedToken = document.getElementsByClassName("selected")[0];
+  if (selectedToken) {
+    const prevToken = selectedToken.previousElementSibling;
+    const nextToken = selectedToken.nextElementSibling;
+    if (prevToken && prevToken.classList.contains("combine-target")) {
+      prevToken.classList.remove("combine-target");
+    }
+    if (nextToken && nextToken.classList.contains("combine-target")) {
+      nextToken.classList.remove("combine-target");
+    }
+  }
+  IscombiningModeEngaged.current = false;
+}
