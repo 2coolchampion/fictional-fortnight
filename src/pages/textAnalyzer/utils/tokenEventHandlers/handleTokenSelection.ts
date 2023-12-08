@@ -2,7 +2,7 @@ const selection = window.getSelection();
 
     // const handleSelectionAndMultiSelect = (e) => {
 
-      export const handleSelection = (e, currentModeRef) => {
+      export const handleSelection = (e, currentModeRef, selectedTokenList, setSelectedTokenList) => {
       // NOTE: Remember to use currentModeRef.current instead of state variable currentMode
 
         if (!selection || selection.rangeCount === 0) return;
@@ -20,6 +20,12 @@ const selection = window.getSelection();
 
             if (!isSpanElementSelected) {
               spanElement.classList.add('selected');
+
+              if (currentModeRef.current === 'editTokenList') {
+                // Add token to selected list
+                setSelectedTokenList([...selectedTokenList, spanElement]);
+                // console.log(`added to list ${selectedTokenList}`);
+              }
 
               if (spanElement.classList.contains("hovering")) {
                 spanElement.classList.remove("hovering");
@@ -65,7 +71,7 @@ const selection = window.getSelection();
         }
       }
 
-      export const handleMultiSelect = (e) => {
+      export const handleMultiSelect = (selectedTokenList, setSelectedTokenList) => {
 
         const sel = document.getSelection();
 
@@ -89,25 +95,39 @@ const selection = window.getSelection();
             return;
           }
 
-
+          const newTokenList = [...selectedTokenList];
       
           anchorNode.classList.add('selected');
 
           const selectNextSibling = (currentSpan: Element, finalSpan: Element) => {
             currentSpan.classList.add('selected');
-  
+
+            if (!newTokenList.includes(currentSpan)) {
+              newTokenList.push(currentSpan);
+            }
+            
             const nextSibbling: Element = currentSpan.nextElementSibling;
-  
+            
             if (nextSibbling !== finalSpan) {
               nextSibbling.classList.add('selected');
               selectNextSibling(nextSibbling, finalSpan);
             } else {
               finalSpan.classList.add('selected');
+
+              if (!newTokenList.includes(finalSpan)) {
+                newTokenList.push(finalSpan);
+              }
+
+              setSelectedTokenList(newTokenList);
             }
           }
   
           const selectPrevSibling = (currentSpan: Element, finalSpan: Element) => {
             currentSpan.classList.add('selected');
+
+            if (!newTokenList.includes(currentSpan)) {
+              newTokenList.push(currentSpan);
+            }
   
             const prevSibbling: Element = currentSpan.nextElementSibling;
   
@@ -116,6 +136,12 @@ const selection = window.getSelection();
               selectPrevSibling(prevSibbling, finalSpan);
             } else {
               finalSpan.classList.add('selected');
+              
+              if (!newTokenList.includes(finalSpan)) {
+                newTokenList.push(finalSpan);
+              }
+
+              setSelectedTokenList(newTokenList);
             }
           }
   

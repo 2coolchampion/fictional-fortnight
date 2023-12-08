@@ -63,12 +63,18 @@ const TextAnalyzer = () => {
   }, []);
 
   const handleSingleTokenSelection = useCallback((e) => {
-    handleSelection(e, currentModeRef);
-  }, [currentModeRef]);
+    handleSelection( e, currentModeRef, selectedTokenList, setSelectedTokenList );
+    if (currentMode !== 'editTokenList') return;
+
+    // console.log(selectedTokenList)
+  }, [currentMode, selectedTokenList]);
+
+  // console.log('two: ',selectedTokenList)
 
   const handleMultiTokenSelection = useCallback((e) => {
-    handleMultiSelect(e);
-  }, [currentModeRef]);
+    if (currentMode !== 'editTokenList') return;
+    handleMultiSelect( selectedTokenList, setSelectedTokenList );
+  }, [currentMode, selectedTokenList]);
   
 
   useEffect(() => {
@@ -81,47 +87,7 @@ const TextAnalyzer = () => {
     }
   }, [handleSingleTokenSelection, handleMultiTokenSelection])
 
-  useEffect(() => {
 
-    const handleAddToTokenList = () => {
-
-      const selection = window.getSelection();
-  
-      if (!selection || selection.rangeCount === 0) return;
-  
-      // add or remove selection class
-  
-      const range = selection.getRangeAt(0);
-      const spanElement = range.commonAncestorContainer.parentElement as HTMLElement;
-  
-      const isSpanElementToken = spanElement.classList.contains('token');
-      const isSpanElementSelected = spanElement.classList.contains('selected');
-  
-      // Add selected to token list
-      if (currentModeRef.current === 'editTokenList') {
-
-        // spanElement.classList.remove("selected");
-  
-        let selectedTokens: Element[] = [...document.getElementsByClassName("selected")];
-        // console.log(document.getElementsByClassName("selected"));
-        // console.log(selectionList);
-        if (selectedTokenList.includes(spanElement)) {
-          // remove from list
-          // selectedTokenList.splice(selectedTokens.indexOf(spanElement), 1);
-  
-          // remove from list usinf filter method
-          setSelectedTokenList(selectedTokenList.filter((token) => token !== spanElement));
-        }          
-        setSelectedTokenList(selectedTokens);
-      };
-    };
-
-    document.addEventListener('mouseup', handleAddToTokenList);
-
-    return () => {
-      document.removeEventListener('mouseup', handleAddToTokenList);
-    }
-    }, []);
   
 
 
@@ -455,7 +421,8 @@ const handleCombining = (side: 'left' | 'right') => {
                 const selectedSpans = textbox.querySelectorAll(".selected")
                 selectedSpans.forEach((span) => {
                   span.classList.remove("selected")
-                })
+                });
+                setSelectedTokenList([]);
                 break;
               case "editToken":
                 setCurrentMode("editTokenList");
@@ -501,6 +468,18 @@ const handleCombining = (side: 'left' | 'right') => {
       <div>Range Count: {rangeCount}</div>
       <div>Range Position: {rangePosition}</div>
       <div>Selected Text: {selectedText}</div>
+      </div>
+      <div>
+        <h1>Tokens in token list:</h1>
+        {selectedTokenList && selectedTokenList.length > 0 ? (
+          <ul>
+            {selectedTokenList.map((token, i) => (
+              <li key={i}>{token.innerHTML}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No tokens found.</p>
+        )}
       </div>
     </>
   );
