@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
-import { handleSplitting } from "./utils/tokenEventHandlers/keyEvents";
+import { handleCombining, handleSplitting } from "./utils/tokenEventHandlers/keyEvents";
 
 const TextAnalyzer = () => {
   
@@ -241,38 +241,6 @@ const TextAnalyzer = () => {
       document.removeEventListener('contextmenu', handleContextMenu);
     };
   }, []);
-
-  const handleCombining = (side: 'left' | 'right') => {
-    if (side === 'left') {
-      const selectedToken = document.getElementsByClassName("selected")[0];
-      const prevToken = selectedToken.previousElementSibling;
-
-
-      // add text from token being merged to the selected token
-      const formattedText = (prevToken as HTMLElement).innerText + (selectedToken as HTMLElement).innerText;
-      (selectedToken as HTMLElement).innerText = formattedText;
-
-      // remove token being merged
-      (prevToken as HTMLElement).remove();
-
-      const newPrevToken = selectedToken.previousElementSibling;
-      newPrevToken.classList.add("combine-target");
-
-      } else {
-      const selectedToken = document.getElementsByClassName("selected")[0];
-      const nextToken = selectedToken.nextElementSibling;
-
-
-      // add text from token being merged to the selected token
-      (selectedToken as HTMLElement).innerText += (nextToken as HTMLElement).innerText;
-
-      // remove token being merged
-      (nextToken as HTMLElement).remove();
-
-      const newNextToken = selectedToken.nextElementSibling;
-      newNextToken.classList.add("combine-target");
-      }
-  }
 
   return (
     <>
