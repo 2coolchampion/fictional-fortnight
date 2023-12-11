@@ -108,9 +108,6 @@ const TextAnalyzer = () => {
       target.classList.remove("hovering");
     }
   };
-
-  const mainContainerRef = useRef<HTMLDivElement>(null);
-
  
   const handleClickOutsideWrapepr = useCallback(
     (e) => {
@@ -145,7 +142,6 @@ const TextAnalyzer = () => {
     <>
       <div
       className="main-container flex flex-col justify-center items-center w-full h-full mt-10"
-      ref={mainContainerRef}
       >
         <div
         id="textbox"
