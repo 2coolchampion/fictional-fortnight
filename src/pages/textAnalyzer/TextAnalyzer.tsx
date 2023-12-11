@@ -4,16 +4,12 @@ import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/h
 import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting, handlehighlightNeighbours } from "./utils/tokenEventHandlers/keyEvents";
 import { handleBlur, handleContextMenu } from "./utils/bugFixers";
 import { handleClickOutside, handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
+import SelectionDebugger from "./Components/SelectionDebugger";
 
 const TextAnalyzer = () => {
   
   const [currentMode, setCurrentMode] = useState<'select' | 'editToken' | 'editTokenList' | null>('select');
   const currentModeRef = useRef<'select' | 'editToken' | 'editTokenList' | null>(currentMode); // This is necessary for the handleSelection eventHandler since value of currentMode state variable is enclosed in the scope of the handleSelection function, and it doesn't get updated when currentMode changes because the function retains a reference to the original value of currentMode from when it was first created. Refs provide a way to persist values across renders without triggering a re-render themselves.
-  
-  const [selection, setSelection] = useState<Selection | null>(null);
-  const [rangeCount, setRangeCount] = useState<number>(0);
-  const [rangePosition, setRangePosition] = useState<number>(0);
-  const [selectedText, setSelectedText] = useState<string>('');
   
   const [selectedTokenList, setSelectedTokenList] = useState<Element[] | null>([]);
   
@@ -40,30 +36,6 @@ const TextAnalyzer = () => {
   useEffect(() => {
     currentModeRef.current = currentMode;
   }, [currentMode]);
-
-  useEffect(() => {
-
-    //display some live-data for debugging purposes
-    const handleSelectionChange = () => {
-      const newSelection = window.getSelection();
-      setSelection(newSelection);
-      setRangeCount(newSelection?.rangeCount || 0);
-      if (newSelection && newSelection.rangeCount > 0) {
-        const range = newSelection.getRangeAt(0);
-        setRangePosition(range.startOffset);
-        setSelectedText(range.toString());
-      } else {
-        setRangePosition(0);
-        setSelectedText('');
-      }
-    };
-
-    document.addEventListener('selectionchange', handleSelectionChange);
-
-    return () => {
-      document.removeEventListener('selectionchange', handleSelectionChange);
-    };
-  }, []);
 
   const handleSingleTokenSelection = useCallback((e) => {
     handleSelection( e, currentModeRef, selectedTokenList, setSelectedTokenList );
@@ -278,10 +250,7 @@ const TextAnalyzer = () => {
         id="tokenData"
         className="w-1/2 mt-10"
         ></div>
-        <div>Selection: {selection ? selection.toString() : 'None'}</div>
-      <div>Range Count: {rangeCount}</div>
-      <div>Range Position: {rangePosition}</div>
-      <div>Selected Text: {selectedText}</div>
+        <SelectionDebugger />
       </div>
       <div>
         <h1>Tokens in token list:</h1>
