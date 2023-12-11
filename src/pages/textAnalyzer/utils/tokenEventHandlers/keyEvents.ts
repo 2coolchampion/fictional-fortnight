@@ -73,6 +73,21 @@ export const handleCombining = (side: 'left' | 'right') => {
     }
 }
 
+export const handlehighlightNeighbours = (IscombiningModeEngaged) => {
+  const selectedToken = document.getElementsByClassName("selected")[0];
+  if (selectedToken) {
+    const prevToken = selectedToken.previousElementSibling;
+    const nextToken = selectedToken.nextElementSibling;
+    if (prevToken) {
+      prevToken.classList.add("combine-target");
+    }
+    if (nextToken) {
+      nextToken.classList.add("combine-target");
+    }
+  }
+  IscombiningModeEngaged.current = true;
+}
+
 export const handleRemoveHighlightedNeighbours = (e, IscombiningModeEngaged) => {
   const selectedToken = document.getElementsByClassName("selected")[0];
   if (selectedToken) {

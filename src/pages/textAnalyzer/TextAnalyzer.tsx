@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
-import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting } from "./utils/tokenEventHandlers/keyEvents";
+import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting, handlehighlightNeighbours } from "./utils/tokenEventHandlers/keyEvents";
 import { handleBlur, handleContextMenu } from "./utils/bugFixers";
 import { handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
 
@@ -161,21 +161,6 @@ const TextAnalyzer = () => {
         };
     }, []);
 
-  const handlehighlightNeighbours = (e) => {
-    const selectedToken = document.getElementsByClassName("selected")[0];
-    if (selectedToken) {
-      const prevToken = selectedToken.previousElementSibling;
-      const nextToken = selectedToken.nextElementSibling;
-      if (prevToken) {
-        prevToken.classList.add("combine-target");
-      }
-      if (nextToken) {
-        nextToken.classList.add("combine-target");
-      }
-    }
-    IscombiningModeEngaged.current = true;
-  }
-
   useEffect(() => {
     // Bug Fix -> Without this code, when user changes tab or right-clicks on another token WHILE STILL HOLDING CTRL + C 🤦 (in combiningMode), the previous and next tokens of the selected token .combining-target class wouldn't be removed.
 
@@ -212,7 +197,7 @@ const TextAnalyzer = () => {
             handleSplitting(e);
           } else if (e.ctrlKey && e.key === 'c') {
             e.preventDefault();
-            handlehighlightNeighbours(e);
+            handlehighlightNeighbours(IscombiningModeEngaged);
             isCTRLPressed.current = true;
           }
 
