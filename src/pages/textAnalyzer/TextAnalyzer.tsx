@@ -5,6 +5,7 @@ import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting, ha
 import { handleBlur, handleContextMenu } from "./utils/bugFixers";
 import { handleClickOutside, handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
 import SelectionDebugger from "./Components/SelectionDebugger";
+import SelectedTokenList from "./Components/SelectedTokenList";
 
 const TextAnalyzer = () => {
   
@@ -251,18 +252,7 @@ const TextAnalyzer = () => {
         className="w-1/2 mt-10"
         ></div>
         <SelectionDebugger />
-      </div>
-      <div>
-        <h1>Tokens in token list:</h1>
-        {selectedTokenList && selectedTokenList.length > 0 ? (
-          <ul>
-            {selectedTokenList.map((token, i) => (
-              <li key={i}>{token.innerHTML}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No tokens found.</p>
-        )}
+        <SelectedTokenList selectedTokenList={selectedTokenList} />
       </div>
     </>
   );
