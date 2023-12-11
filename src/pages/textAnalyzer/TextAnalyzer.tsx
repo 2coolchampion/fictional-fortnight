@@ -3,7 +3,7 @@ import handleSendToFastAPI from "./utils/api";
 import { handleSelection, handleMultiSelect } from "./utils/tokenEventHandlers/handleTokenSelection";
 import { handleCombining, handleRemoveHighlightedNeighbours, handleSplitting, handlehighlightNeighbours } from "./utils/tokenEventHandlers/keyEvents";
 import { handleBlur, handleContextMenu } from "./utils/bugFixers";
-import { handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
+import { handleClickOutside, handleMouseDown } from "./utils/tokenEventHandlers/mouseEvents";
 
 const TextAnalyzer = () => {
   
@@ -111,53 +111,18 @@ const TextAnalyzer = () => {
 
   const mainContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleClickOutside = (e: MouseEvent) => {
-
-    if ( currentModeRef.current === "editTokenList") {
-      return;
-    }
-
-    const target = e.target as HTMLElement;
-    const selectedSpans = document.getElementsByClassName("selected")
-
-    if (
-      !(target.id === "textbox") &&
-      !target.classList.contains('token') &&
-      selectedSpans.length > 0
-    ) {
-      //Remove combining-target class if user was in combining mode
-      if (IscombiningModeEngaged.current) {
-        const selectedToken = document.getElementsByClassName("selected")[0];
-        if (selectedToken) {
-          const prevToken = selectedToken.previousElementSibling;
-          const nextToken = selectedToken.nextElementSibling;
-          if (prevToken && prevToken.classList.contains("combine-target")) {
-            prevToken.classList.remove("combine-target");
-          }
-          if (nextToken && nextToken.classList.contains("combine-target")) {
-            nextToken.classList.remove("combine-target");
-          }
-
-          IscombiningModeEngaged.current = false;
-        }
-      }
-
-      // remove .selected class from all selected tokens
-      const selectedSpans = document.getElementsByClassName("selected");
-      for (let i = 0; i < selectedSpans.length; i++) {
-        selectedSpans[i].classList.remove("selected");
-      }
-    }
-
-
-  };
-
+ 
+  const handleClickOutsideWrapepr = useCallback(
+    (e) => {
+      handleClickOutside(e, currentModeRef, IscombiningModeEngaged);
+    }, []
+  )
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutsideWrapepr);
 
         return () => {
-          document.removeEventListener('mousedown', handleClickOutside);
+          document.removeEventListener('mousedown', handleClickOutsideWrapepr);
         };
     }, []);
 

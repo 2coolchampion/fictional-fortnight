@@ -15,3 +15,44 @@ export const handleMouseDown = (e, lastSelectedTokenRef) => {
   }
 
 };
+
+export  const handleClickOutside = (e: MouseEvent, currentModeRef, IscombiningModeEngaged) => {
+
+  if ( currentModeRef.current === "editTokenList") {
+    return;
+  }
+
+  const target = e.target as HTMLElement;
+  const selectedSpans = document.getElementsByClassName("selected")
+
+  if (
+    !(target.id === "textbox") &&
+    !target.classList.contains('token') &&
+    selectedSpans.length > 0
+  ) {
+    //Remove combining-target class if user was in combining mode
+    if (IscombiningModeEngaged.current) {
+      const selectedToken = document.getElementsByClassName("selected")[0];
+      if (selectedToken) {
+        const prevToken = selectedToken.previousElementSibling;
+        const nextToken = selectedToken.nextElementSibling;
+        if (prevToken && prevToken.classList.contains("combine-target")) {
+          prevToken.classList.remove("combine-target");
+        }
+        if (nextToken && nextToken.classList.contains("combine-target")) {
+          nextToken.classList.remove("combine-target");
+        }
+
+        IscombiningModeEngaged.current = false;
+      }
+    }
+
+    // remove .selected class from all selected tokens
+    const selectedSpans = document.getElementsByClassName("selected");
+    for (let i = 0; i < selectedSpans.length; i++) {
+      selectedSpans[i].classList.remove("selected");
+    }
+  }
+
+
+};
