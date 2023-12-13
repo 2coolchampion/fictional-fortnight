@@ -120,7 +120,7 @@ const TextAnalyzer = () => {
         id="textbox"
         ref={(node) => (textboxRef.current = node)}
         contentEditable
-        className="border-1 border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
+        className="border border-orange-100 p-14 w-1/2 mb-10 focus:outline-0 text-3xl"
         onKeyDownCapture={(e: React.KeyboardEvent) => {
           if (currentMode !== "editToken") {
             return;
@@ -187,19 +187,19 @@ const TextAnalyzer = () => {
         className="flex justify-between w-1/2"
         >
           <button
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
+          className="text-sm p-1 border border-orange-100 hover:bg-purple-900 px-2"
           onClick={addText}
           >
             Paste
           </button>
           <button
-          className="text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2"
+          className="text-sm p-1 border border-orange-100 hover:bg-purple-900 px-2"
           onClick={handleSendToFastAPI}
           >
             Scan
           </button>
           <button
-          className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editTokenList' ? 'bg-purple-900' : ''}`}
+          className={`text-sm p-1 border border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editTokenList' ? 'bg-purple-900' : ''}`}
           onClick={() => {
             switch (currentMode) {
               case "editTokenList":
@@ -226,7 +226,7 @@ const TextAnalyzer = () => {
             Edit token Lists
           </button>
           <button
-          className={`text-sm p-1 border-1 border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editToken' ? 'bg-purple-900' : ''}`}
+          className={`text-sm p-1 border border-orange-100 hover:bg-purple-900 px-2 ${currentMode === 'editToken' ? 'bg-purple-900' : ''}`}
           onClick={() => {
             switch (currentMode) {
               case "editTokenList":

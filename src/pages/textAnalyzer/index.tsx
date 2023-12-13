@@ -1,5 +1,5 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
+import '../../global.css'
 import "@pages/textAnalyzer/index.css";
 import TextAnalyzer from "@root/src/pages/textAnalyzer/TextAnalyzer";
 import refreshOnUpdate from "virtual:reload-on-update-in-view";
