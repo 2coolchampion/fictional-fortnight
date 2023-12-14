@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Styles from "@src/global.css";
 
 export default function App() {
   useEffect(() => {
@@ -7,8 +8,9 @@ export default function App() {
 
   return (
     <>
+    <style>{Styles}</style>
       <div 
-        className="text-lime-400 p-4 w-screen bg-red-400"
+        className="text-lime-400 p-4 w-screen bg-red-400 font-sans" // Need to set the font family because otherwise it would inherit from website.
       >
         content view
         <button

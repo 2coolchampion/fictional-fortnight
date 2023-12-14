@@ -66,6 +66,7 @@ const Popup = () => {
               updatedList.map((site) => `*://${site}/*`) :
               whitelist.map((site) => `*://${site}/*`),
               js: ["src/pages/content/index.js"],
+              css: ["./assets/css/_virtual_reload-on-update-in-view.chunk.css"],
             }
           ])
     } else if (mode === 'blacklist') {
@@ -78,6 +79,7 @@ const Popup = () => {
           updatedList.map((site) => `*://${site}/*`) : 
           blacklist.map((site) => `*://${site}/*`),
           js: ["src/pages/content/index.js"],
+          css: ["./assets/css/_virtual_reload-on-update-in-view.chunk.css"],
         }
       ])
     }

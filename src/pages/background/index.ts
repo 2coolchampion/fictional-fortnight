@@ -19,6 +19,7 @@ chrome.runtime.onInstalled.addListener(async () => {
     matches: ['*://*/*'],
     js: ["src/pages/content/index.js"],
     // KEY for cache invalidation
+    css: ["Global.chunk.css"],
     // css: ["assets/css/contentStyle.chunk.css"],
   }]).then(async () => {
     const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
