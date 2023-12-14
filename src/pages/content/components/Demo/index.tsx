@@ -6,7 +6,6 @@ refreshOnUpdate("pages/content");
 
 const root = document.createElement("div");
 root.id = "fictional-fortnight-content-view-root";
-root.style.all = "unset";
 
 document.body.append(root);
 
