@@ -66,6 +66,7 @@ const Popup = () => {
               updatedList.map((site) => `*://${site}/*`) :
               whitelist.map((site) => `*://${site}/*`),
               js: ["src/pages/content/index.js"],
+              css: ["./assets/css/_virtual_reload-on-update-in-view.chunk.css"],
             }
           ])
     } else if (mode === 'blacklist') {
@@ -78,6 +79,7 @@ const Popup = () => {
           updatedList.map((site) => `*://${site}/*`) : 
           blacklist.map((site) => `*://${site}/*`),
           js: ["src/pages/content/index.js"],
+          css: ["./assets/css/_virtual_reload-on-update-in-view.chunk.css"],
         }
       ])
     }
@@ -282,14 +284,14 @@ const Popup = () => {
   const renderButton = () => {
     if (isOnList()) {
       return (
-        <button className="text-sm p-1 border-1 border-red-500" onClick={removeFromList}>
+        <button className="text-sm p-1 border border-red-500" onClick={removeFromList}>
           -
           {currentSiteHostname}
         </button>
       );
     } else {
       return (
-        <button className="text-sm p-1 border-1 border-green-500" onClick={addToList}>
+        <button className="text-sm p-1 border border-green-500" onClick={addToList}>
           +
           {currentSiteHostname}
         </button>

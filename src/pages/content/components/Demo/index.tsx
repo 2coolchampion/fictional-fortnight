@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import '../../../../global.css'
 import App from "@src/pages/content/components/Demo/app";
 import refreshOnUpdate from "virtual:reload-on-update-in-view";
 
@@ -7,7 +6,6 @@ refreshOnUpdate("pages/content");
 
 const root = document.createElement("div");
 root.id = "fictional-fortnight-content-view-root";
-root.style.all = "unset";
 
 document.body.append(root);
 
