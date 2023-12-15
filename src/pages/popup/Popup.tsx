@@ -284,18 +284,34 @@ const Popup = () => {
   const renderButton = () => {
     if (isOnList()) {
       return (
-        <button className="text-sm p-1 border border-red-500" onClick={removeFromList}>
-          -
+        <div className="flex items-center p-1 border border-red-500 rounded bg-red-400">
+          <img 
+          src={`https://www.google.com/s2/favicons?domain=${currentSiteHostname}`} 
+          alt={`${currentSiteHostname} favicon`} 
+          className="w-4 h-4 mr-2 border border-red-500 rounded bg-white" 
+          />
+        <button className="text-sm" onClick={removeFromList}>
+          -&nbsp;
           {currentSiteHostname}
         </button>
+        </div>
       );
     } else {
       return (
-        <button className="text-sm p-1 border border-green-500" onClick={addToList}>
-          +
+        <div className="flex items-center p-1 border border-green-500 rounded bg-green-400">
+          <img 
+          src={`https://www.google.com/s2/favicons?domain=${currentSiteHostname}`} 
+          alt={`${currentSiteHostname} favicon`} 
+          className="w-4 h-4 mr-2 border border-green-500 rounded bg-white" 
+          />
+        <button className="text-sm" onClick={addToList}>
+          +&nbsp;
           {currentSiteHostname}
         </button>
-      );
+
+
+        </div>
+        );
     }
   };
 
@@ -350,9 +366,14 @@ const Popup = () => {
           {mode === 'whitelist' ? (
             whitelist.map((site) => (
               <div
-                className="flex left"
+                className="flex left items-center"
                   key={site}
                 >
+                <img 
+                src={`https://www.google.com/s2/favicons?domain=${site}`} 
+                alt={`${site} favicon`} 
+                className="w-4 h-4 mr-2" 
+                />
                 <p 
                   className="inline"
                 >
@@ -376,9 +397,14 @@ const Popup = () => {
           ) : (
             blacklist.map((site) => (
               <div
-                className="flex left"
+                className="flex left items-center"
                   key={site}
                 >
+                <img 
+                src={`https://www.google.com/s2/favicons?domain=${site}`} 
+                alt={`${site} favicon`} 
+                className="w-4 h-4 mr-2" 
+                />
                 <p 
                   className="inline"
                 >
