@@ -7,17 +7,22 @@ import whitelistStorage from "@root/src/shared/storages/whitelistStorage";
 import blacklistStorage from "@root/src/shared/storages/blacklistStorage";
 import withSuspense from "@src/shared/hoc/withSuspense";
 import settingsIcon from "@src/assets/icons/settings.svg";
+import useListManagement from '@src/pages/popup/Utils/useListManagment';
 
 const Popup = () => {
   // const theme = useStorage(exampleThemeStorage);
   const mode = useStorage (extensionModeStorage);
   const [widgetEnabled, setWidgetEnabled] = useState(false)
-  let whitelist = useStorage(whitelistStorage);
-  let blacklist = useStorage(blacklistStorage);
+  // let whitelist = useStorage(whitelistStorage);
+  // let blacklist = useStorage(blacklistStorage);
   const [currentSite, setCurrentSite] = useState<URL | null>(null);
   const  [currentSiteHostname, setCurrentSiteHostname] = useState(currentSite?.hostname?.replace(/^www\./, "") ?? "Something's wrong");
-  const [contentScripts, setContentScripts] = useState([]);
+  const {whitelist, blacklist, registerScript, unregisterScript, updateScript, addToList, removeFromList} = useListManagement(mode);
+  
+  const [contentScripts, setContentScripts] = useState([]); //debugging
 
+  // Sets the initial widgetEnabled state
+  // And initializes the currentSite state variable
   useEffect(() => {
     chrome.scripting.getRegisteredContentScripts((contentScripts) => {
       if (contentScripts.length > 0) {
@@ -54,83 +59,6 @@ const Popup = () => {
       setContentScripts(scripts);
     });
   };
-
-  const registerScript = (mode: 'whitelist' | 'blacklist', updatedList?) => {
-
-      if (mode === 'whitelist') {
-        
-          chrome.scripting.registerContentScripts([
-            {
-              id: "compactWidget-script",
-              matches: updatedList ? 
-              updatedList.map((site) => `*://${site}/*`) :
-              whitelist.map((site) => `*://${site}/*`),
-              js: ["src/pages/content/index.js"],
-              css: ["./assets/css/Global.chunk.css"],
-            }
-          ])
-    } else if (mode === 'blacklist') {
-
-      chrome.scripting.registerContentScripts([
-        {
-          id: "compactWidget-script",
-          matches: ["*://*/*"],
-          excludeMatches: updatedList ? 
-          updatedList.map((site) => `*://${site}/*`) : 
-          blacklist.map((site) => `*://${site}/*`),
-          js: ["src/pages/content/index.js"],
-          css: ["./assets/css/Global.chunk.css"],
-        }
-      ])
-    }
-  }
-
-  const updateScript = (mode: 'whitelist' | 'blacklist', updatedList?) => {
-    if (mode === 'whitelist') {
-      chrome.scripting.updateContentScripts([{
-        id: "compactWidget-script",
-        matches: updatedList ? updatedList.map((site) => `*://${site}/*`) : whitelist.map((site) => `*://${site}/*`),
-        excludeMatches: [],
-        js: ["src/pages/content/index.js"],
-      }])
-    } else if (mode === 'blacklist') {
-      chrome.scripting.updateContentScripts([{
-        id: "compactWidget-script",
-        matches: ["*://*/*"],
-        excludeMatches: updatedList ? updatedList.map((site) => `*://${site}/*`) : blacklist.map((site) => `*://${site}/*`),
-        js: ["src/pages/content/index.js"],
-      }])
-    }
-  }
-
-  const unregisterScript = async (updatedList) => {
-    // ONLY USE FOR WHEN ITEMS ARE BEING REMOVED FROM WHITELIST OR BLACKLIST
-    // removes a script if the last item in current whitelist or blacklist is removed.
-                  
-    // if ((mode === 'whitelist' && whitelist.length === 0) || (mode === 'blacklist' && blacklist.length === 0)) {
-    //   chrome.scripting.unregisterContentScripts({
-    //     ids: ["compactWidget-script"], 
-    //   });
-    // }
-
-    const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
-
-    if (mode === 'whitelist' && updatedList.length === 0 && registeredScripts.length > 0) {
-      chrome.scripting.unregisterContentScripts({
-        ids: ["compactWidget-script"], 
-      });
-    };
-
-    if (mode === 'blacklist' && updatedList.length === 0 && registeredScripts.length > 0) {
-      
-      chrome.scripting.unregisterContentScripts({
-        ids: ["compactWidget-script"], 
-      });
-
-    };
-
-    
-  }
 
   const toggleWidget = () => {
     if (widgetEnabled) {
@@ -182,96 +110,6 @@ const Popup = () => {
 
   }
 
-  const addToList = async () => {
-    const activeTab = await chrome.tabs.query({active: true, currentWindow: true});
-    const currentSite = new URL(activeTab[0].url).hostname
-  
-    if (activeTab.length > 0) {
-      if ( mode === 'whitelist') {
-
-        if (widgetEnabled) {
-          if (whitelist.length === 0) {
-            // add to whitelist and register the content script
-            const updatedWhitelist = await whitelistStorage.set([currentSite]);
-            registerScript("whitelist", updatedWhitelist);
-          } else {
-            // add to whitelist and update the content script
-            const updatedWhitelist = await whitelistStorage.set([...whitelist, currentSite]);
-            updateScript("whitelist", updatedWhitelist);
-          }
-        } else if (!widgetEnabled) {
-          // just add to whitelist
-          whitelistStorage.set([...whitelist, currentSite])
-        }
-
-      } else if (mode === 'blacklist') {
-
-        if (widgetEnabled) {
-
-          const registeredScripts = await chrome.scripting.getRegisteredContentScripts();
-
-          if (blacklist.length === 0 && registeredScripts.length === 0) {
-            // add to blacklist and register the content script
-            const updatedBlacklist = await blacklistStorage.set([currentSite]);
-            registerScript("blacklist", updatedBlacklist);
-          } else if (blacklist.length === 0 && registeredScripts.length != 0) {
-            // add to blacklist and update the content script. This is only going to execute when the extension is first installed.
-            const updatedBlacklist = await blacklistStorage.set([...blacklist, currentSite]);
-            updateScript("blacklist", updatedBlacklist);
-          } else {
-            // add to blacklist and update the content script
-            const updatedBlacklist = await blacklistStorage.set([...blacklist, currentSite]);
-            updateScript("blacklist", updatedBlacklist);
-          }
-        } else if (!widgetEnabled) {
-          // just add to blacklist
-          blacklistStorage.set([...blacklist, currentSite])
-        }
-      }
-    } else {
-      console.error("No active tab");
-    }
-  }
-
-  const removeFromList = async () => {
-    const activeTab = await chrome.tabs.query({active: true, currentWindow: true});
-    const currentSite = new URL(activeTab[0].url).hostname
-    
-    if (activeTab.length > 0) {
-      if (mode === 'whitelist') {
-
-        if (widgetEnabled) {
-          if (whitelist.length === 1) {
-            // remove from whitelist and unregister the content script
-            whitelistStorage.remove(currentSite);
-            chrome.scripting.unregisterContentScripts({
-              ids: ["compactWidget-script"], 
-            });
-          } else {
-            // remove from whitelist and update the content script
-            const updatedWhitelist = await whitelistStorage.remove(currentSite);
-            updateScript("whitelist", updatedWhitelist);
-          }
-          
-        } else if  (!widgetEnabled) {
-          whitelistStorage.remove(currentSite)
-        }
-
-      } else if (mode === 'blacklist') {
-
-        if (widgetEnabled) {
-
-            // remove from blacklist and update the content script
-            const updatedBlacklist = await blacklistStorage.remove(currentSite);
-            updateScript("blacklist", updatedBlacklist);
-          
-        } else if (!widgetEnabled) {
-          blacklistStorage.remove(currentSite)
-        }
-      }
-    }
-  }
-
   const isOnList = () => {
     if (mode === 'whitelist') {
       return whitelist.includes(currentSiteHostname);
@@ -290,7 +128,7 @@ const Popup = () => {
           alt={`${currentSiteHostname} favicon`} 
           className="w-4 h-4 mr-2 border border-red-500 rounded bg-white" 
           />
-        <button className="text-sm" onClick={removeFromList}>
+        <button className="text-sm" onClick={() => removeFromList(widgetEnabled)}>
           -&nbsp;
           {currentSiteHostname}
         </button>
@@ -304,7 +142,7 @@ const Popup = () => {
           alt={`${currentSiteHostname} favicon`} 
           className="w-4 h-4 mr-2 border border-green-500 rounded bg-white" 
           />
-        <button className="text-sm" onClick={addToList}>
+        <button className="text-sm" onClick={() => addToList(widgetEnabled)}>
           +&nbsp;
           {currentSiteHostname}
         </button>
