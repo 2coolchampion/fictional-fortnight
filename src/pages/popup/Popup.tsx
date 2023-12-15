@@ -284,14 +284,14 @@ const Popup = () => {
   const renderButton = () => {
     if (isOnList()) {
       return (
-        <button className="text-sm p-1 border-1 border-red-500" onClick={removeFromList}>
+        <button className="text-sm p-1 border border-red-500" onClick={removeFromList}>
           -
           {currentSiteHostname}
         </button>
       );
     } else {
       return (
-        <button className="text-sm p-1 border-1 border-green-500" onClick={addToList}>
+        <button className="text-sm p-1 border border-green-500" onClick={addToList}>
           +
           {currentSiteHostname}
         </button>
