@@ -81,13 +81,9 @@ const Popup = () => {
 
     if (widgetEnabled) {
       if (registeredScripts.length > 0) {
-        if (mode === 'whitelist' && blacklist.length != 0) {
+        if (mode === 'whitelist') {
           updateScript("blacklist");
-  
-        } else if ( mode === 'whitelist' && blacklist.length === 0) {
-          chrome.scripting.unregisterContentScripts({
-            ids: ["compactWidget-script"], 
-          });
+
         } else if (mode === 'blacklist' && whitelist.length != 0) {
           updateScript("whitelist");
   
