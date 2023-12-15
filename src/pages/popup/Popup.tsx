@@ -121,7 +121,7 @@ const Popup = () => {
       });
     };
 
-    if (mode === 'blacklist' && updatedList.length === 0 && registerScript.length > 0) {
+    if (mode === 'blacklist' && updatedList.length === 0 && registeredScripts.length > 0) {
       
       chrome.scripting.unregisterContentScripts({
         ids: ["compactWidget-script"], 
