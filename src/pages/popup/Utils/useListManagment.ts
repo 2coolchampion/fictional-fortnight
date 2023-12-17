@@ -186,4 +186,6 @@ const useListManagement = (mode) => {
   }
 }
 
+// !todo: I could potentially group register and unregister script into their own hook, related to script managment, and leave the rest for siteList managment.
+
 export default useListManagement;
