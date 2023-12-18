@@ -9,7 +9,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   version: packageJson.version,
   description: packageJson.description,
   permissions: ["storage", "scripting"],
-  host_permissions: ['*://*/*'],
+  host_permissions: ["*://*/*"],
   options_page: "src/pages/options/index.html",
   background: {
     service_worker: "src/pages/background/index.js",

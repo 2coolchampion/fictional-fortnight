@@ -8,7 +8,6 @@
 ![GitHub action badge](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/actions/workflows/build-zip.yml/badge.svg)
 <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://github.com/Jonghakseo/chrome-extension-boilerplate-react-viteFactions&count_bg=%23#222222&title_bg=%23#454545&title=😀&edge_flat=true" alt="hits"/>
 
-
 > This project is listed in the [Awesome Vite](https://github.com/vitejs/awesome-vite)
 
 </div>
@@ -18,18 +17,19 @@
 - [Intro](#intro)
 - [Features](#features)
 - [Installation](#installation)
-    - [Procedures](#procedures)
-      - [Chrome](#chrome) 
-      - [Firefox](#firefox) 
+  - [Procedures](#procedures)
+    - [Chrome](#chrome)
+    - [Firefox](#firefox)
 - [Screenshots](#screenshots)
-    - [NewTab](#newtab)
-    - [Popup](#popup)
+  - [NewTab](#newtab)
+  - [Popup](#popup)
 - [Examples](#examples)
 - [Documents](#documents)
 
 ## Intro <a name="intro"></a>
 
 This boilerplate is made for creating chrome extensions using React and Typescript.
+
 > The focus was on improving the build speed and development experience with Vite.
 
 ## Features <a name="features"></a>
@@ -59,8 +59,8 @@ This boilerplate is made for creating chrome extensions using React and Typescri
 ### For Chrome: <a name="chrome"></a>
 
 1. Run:
-    - Dev: `yarn dev` or `npm run dev`
-    - Prod: `yarn build` or `npm run build`
+   - Dev: `yarn dev` or `npm run dev`
+   - Prod: `yarn build` or `npm run build`
 2. Open in browser - `chrome://extensions`
 3. Check - `Developer mode`
 4. Find and Click - `Load unpacked extension`
@@ -69,8 +69,8 @@ This boilerplate is made for creating chrome extensions using React and Typescri
 ### For Firefox: <a name="firefox"></a>
 
 1. Run:
-    - Dev: `yarn dev:firefox` or `npm run dev:firefox`
-    - Prod: `yarn build:firefox` or `npm run build:firefox`
+   - Dev: `yarn dev:firefox` or `npm run dev:firefox`
+   - Prod: `yarn build:firefox` or `npm run build:firefox`
 2. Open in browser - `about:debugging#/runtime/this-firefox`
 3. Find and Click - `Load Temporary Add-on...`
 4. Select - `manifest.json` from `dist` folder
@@ -104,14 +104,12 @@ This boilerplate is made for creating chrome extensions using React and Typescri
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Jonghakseo/chrome-extension-boilerplate-react-vite&type=Date)](https://star-history.com/#Jonghakseo/chrome-extension-boilerplate-react-vite&Date)
 
-
-
 ---
 
 ## Thanks To
 
 | [Jetbrains](https://jb.gg/OpenSourceSupport)                                                                                               | [Jackson Hong](https://www.linkedin.com/in/j-acks0n/)                                            |
-|--------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
 | <img width="100" src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo."> | <img width="100" src='https://avatars.githubusercontent.com/u/23139754?v=4' alt='Jackson Hong'/> |
 
 ---

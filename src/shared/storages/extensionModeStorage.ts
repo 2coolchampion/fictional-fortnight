@@ -1,11 +1,10 @@
-import { 
-  createStorage, 
-  StorageType 
-} from "@src/shared/storages/base";
+import { createStorage, StorageType } from "@src/shared/storages/base";
 
 export type ExtensionMode = "blacklist" | "whitelist";
 
-const storage = createStorage<ExtensionMode>('extension-mode', 'blacklist', { storageType: StorageType.Local });
+const storage = createStorage<ExtensionMode>("extension-mode", "blacklist", {
+  storageType: StorageType.Local,
+});
 
 const extensionModeStorage = {
   ...storage,
@@ -14,7 +13,7 @@ const extensionModeStorage = {
     storage.set((currentMode) => {
       return currentMode === "blacklist" ? "whitelist" : "blacklist";
     });
-  }
+  },
 };
 
 export default extensionModeStorage;

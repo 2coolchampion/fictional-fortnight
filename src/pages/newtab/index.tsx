@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import Newtab from "@pages/newtab/Newtab";
-import '../../global.css'
+import "../../global.css";
 import "@pages/newtab/index.css";
 import refreshOnUpdate from "virtual:reload-on-update-in-view";
 

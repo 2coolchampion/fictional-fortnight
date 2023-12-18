@@ -9,7 +9,7 @@ root.id = "fictional-fortnight-content-view-root";
 
 document.body.append(root);
 
-root.style.zIndex = '9999'
+root.style.zIndex = "9999";
 root.style.position = "fixed";
 root.style.bottom = "0";
 root.style.right = "0";
