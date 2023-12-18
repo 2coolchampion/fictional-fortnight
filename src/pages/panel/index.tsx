@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import Panel from "@pages/panel/Panel";
-import '../../global.css'
+import "../../global.css";
 import "@pages/panel/index.css";
 import refreshOnUpdate from "virtual:reload-on-update-in-view";
 

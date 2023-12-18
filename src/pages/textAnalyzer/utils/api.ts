@@ -15,13 +15,12 @@ const handleSendToFastAPI = () => {
       let formattedText = "";
       let currentIndex = 0;
 
-      data.forEach(tokenInfo => {
+      data.forEach((tokenInfo) => {
         // Add the text before the token
         formattedText += originalText.slice(currentIndex, tokenInfo.start);
 
         // Add the token as a span element
-        formattedText +=
-        `<span data-id="${tokenInfo.id}" data-pos="${tokenInfo.pos}" data-dependency="${tokenInfo.dependency}" class="token">${tokenInfo.text}</span>`;
+        formattedText += `<span data-id="${tokenInfo.id}" data-pos="${tokenInfo.pos}" data-dependency="${tokenInfo.dependency}" class="token">${tokenInfo.text}</span>`;
 
         currentIndex = tokenInfo.end;
       });
@@ -31,7 +30,6 @@ const handleSendToFastAPI = () => {
 
       // Replace the original text with the formatted text
       document.getElementById("textbox").innerHTML = formattedText;
-
     })
     .catch((error) => {
       console.error("Error:", error);

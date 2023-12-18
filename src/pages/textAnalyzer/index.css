@@ -1,4 +1,4 @@
-body  {
+body {
   background-color: #331d76;
   color: #dcd4f1;
   background-image: url(/src/assets/img/bg-white-lighter.png);
@@ -9,7 +9,6 @@ body  {
 
 .token {
   color: #f1e1d4;
-
 }
 
 span.token {
@@ -17,7 +16,7 @@ span.token {
 }
 
 span.token.selected {
-  background-color: #FA6526;
+  background-color: #fa6526;
 }
 
 span.token.hovering::before {
@@ -38,7 +37,7 @@ span.token.hovering::after {
   display: inline-block; /* Make it a block element */
   height: 8px; /* Set the height of the underline */
   width: 100%; /* Make the underline span the full width of the parent */
-  background-color: #FA6526; /* Set the color of the underline */
+  background-color: #fa6526; /* Set the color of the underline */
   position: absolute; /* Change from relative to absolute */
   bottom: 0; /* Position the underline at the bottom of the span */
   left: 0; /* Align the underline with the left edge of the span */

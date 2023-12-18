@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 
 const SelectionDebugger = () => {
-
   const [selection, setSelection] = useState<Selection | null>(null);
   const [rangeCount, setRangeCount] = useState<number>(0);
   const [rangePosition, setRangePosition] = useState<number>(0);
-  const [selectedText, setSelectedText] = useState<string>('');
+  const [selectedText, setSelectedText] = useState<string>("");
 
   useEffect(() => {
-
     //display some live-data for debugging purposes
     const handleSelectionChange = () => {
       const newSelection = window.getSelection();
@@ -20,25 +18,25 @@ const SelectionDebugger = () => {
         setSelectedText(range.toString());
       } else {
         setRangePosition(0);
-        setSelectedText('');
+        setSelectedText("");
       }
     };
 
-    document.addEventListener('selectionchange', handleSelectionChange);
+    document.addEventListener("selectionchange", handleSelectionChange);
 
     return () => {
-      document.removeEventListener('selectionchange', handleSelectionChange);
+      document.removeEventListener("selectionchange", handleSelectionChange);
     };
   }, []);
 
   return (
-    <div className="bg-violet-700 p-4 text-base border-1">
-      <div>Selection: {selection ? selection.toString() : 'None'}</div>
+    <div className="border-1 bg-violet-700 p-4 text-base">
+      <div>Selection: {selection ? selection.toString() : "None"}</div>
       <div>Range Count: {rangeCount}</div>
       <div>Range Position: {rangePosition}</div>
       <div>Selected Text: {selectedText}</div>
     </div>
-  )
-}
+  );
+};
 
-export default SelectionDebugger
+export default SelectionDebugger;

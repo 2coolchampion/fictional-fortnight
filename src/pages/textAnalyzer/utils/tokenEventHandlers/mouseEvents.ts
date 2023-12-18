@@ -13,21 +13,23 @@ export const handleMouseDown = (e, lastSelectedTokenRef) => {
   if (nextSibling) {
     nextSibling.classList.remove("combine-target");
   }
-
 };
 
-export  const handleClickOutside = (e: MouseEvent, currentModeRef, IscombiningModeEngaged) => {
-
-  if ( currentModeRef.current === "editTokenList") {
+export const handleClickOutside = (
+  e: MouseEvent,
+  currentModeRef,
+  IscombiningModeEngaged
+) => {
+  if (currentModeRef.current === "editTokenList") {
     return;
   }
 
   const target = e.target as HTMLElement;
-  const selectedSpans = document.getElementsByClassName("selected")
+  const selectedSpans = document.getElementsByClassName("selected");
 
   if (
     !(target.id === "textbox") &&
-    !target.classList.contains('token') &&
+    !target.classList.contains("token") &&
     selectedSpans.length > 0
   ) {
     //Remove combining-target class if user was in combining mode
@@ -53,6 +55,4 @@ export  const handleClickOutside = (e: MouseEvent, currentModeRef, IscombiningMo
       selectedSpans[i].classList.remove("selected");
     }
   }
-
-
 };
